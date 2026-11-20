@@ -56,8 +56,19 @@ export function bom(p: Projeto, d: Design): LinhaBom[] {
       { item: tr('Parafuso de trava do tubo', 'Tube locking bolt'), especificacao: `M${m.parafusoD} × ${Math.ceil(2 * ro + 8)} mm`, qtd: encaixes, un, obs: tr('Um por encaixe', 'One per socket') },
       { item: tr('Porca autotravante', 'Lock nut'), especificacao: `M${m.parafusoD}`, qtd: encaixes, un, obs: '' },
     )
+  const c = cintas(p, d)
   linhas.push(
-    { item: tr('Fita de nylon', 'Nylon webbing'), especificacao: '25 mm', qtd: 2, un: 'm', obs: tr('Sela/argolas das pernas', 'Saddle / leg rings') },
+    {
+      item: tr('Fita de nylon', 'Nylon webbing'),
+      especificacao: '25 mm',
+      qtd: c.fitaM,
+      un: 'm',
+      obs: tr(
+        `${c.sela} cinta(s) de sela de ~${Math.round(c.selaMm / 10)} cm${c.ligacoes ? ` + ${c.ligacoes} ligação(ões) ao arnês de ~${Math.round(c.ligacaoMm / 10)} cm` : ''}, com 10% de sobra (estimativa)`,
+        `${c.sela} saddle strap(s) of ~${Math.round(c.selaMm / 10)} cm${c.ligacoes ? ` + ${c.ligacoes} harness link(s) of ~${Math.round(c.ligacaoMm / 10)} cm` : ''}, with 10% spare (estimate)`,
+      ),
+    },
+    { item: tr('Velcro (ou fivela) para a cinta', 'Velcro (or buckle) for the strap'), especificacao: tr('25 mm, ~10 cm por cinta', '25 mm, ~10 cm per strap'), qtd: c.sela + c.ligacoes, un, obs: tr('Fecha cada cinta e permite ajustar', 'Closes each strap and allows adjusting') },
     { item: tr('Espuma ou neoprene', 'Foam or neoprene'), especificacao: tr('5 mm, para forrar a sela', '5 mm, to pad the saddle'), qtd: 1, un, obs: '~30 × 20 cm' },
     p.tipo === 'traseira'
       ? { item: tr('Peitoral (arnês)', 'Chest harness'), especificacao: tr(`para cão de ${p.cao.pesoKg} kg`, `for a ${p.cao.pesoKg} kg dog`), qtd: 1, un, obs: tr('Comercial; prende nas ponteiras', 'Off the shelf; ties to the end caps') }
@@ -66,6 +77,26 @@ export function bom(p: Projeto, d: Design): LinhaBom[] {
         : { item: tr('Sela de corpo inteiro', 'Full-body sling'), especificacao: tr('Tecido resistente com alças', 'Sturdy fabric with straps'), qtd: 1, un, obs: tr('Apoia peito e barriga; presa nos clips', 'Supports chest and belly; hangs from the clips') },
   )
   return linhas
+}
+
+// ponytail: comprimentos de cinta estimados pela geometria; conferir na montagem real
+const VOLTA_CLIP_MM = 80 // fita que dá a volta no clip e sobrepõe no velcro, de cada lado
+const LIGACAO_MM = 250 // ponteira → argola do arnês, com sobra para ajuste
+
+/** Cintas de fita: uma por par de clips (passa sob o corpo) e uma por ponteira (liga ao arnês). */
+export function cintas(p: Projeto, d: Design) {
+  const sela = d.juntas.filter((j) => j.spec.tipo === 'clipSela').length / 2
+  const ligacoes = d.juntas.filter((j) => j.spec.tipo === 'ponteira').length
+  const corpo = p.medidas.larguraCm * 10
+  // de um trilho ao outro por baixo da barriga: ~1,6× a largura do corpo, mais a folga dos dois lados
+  const selaMm = Math.round(corpo * 1.6 + 2 * p.ajustes.folgaLateralCm * 10 + 2 * VOLTA_CLIP_MM)
+  const fitaM = Math.ceil(((sela * selaMm + ligacoes * LIGACAO_MM) * PERDA_CORTE) / 100) / 10
+  return { sela, selaMm, ligacoes, ligacaoMm: LIGACAO_MM, fitaM }
+}
+
+/** Itens comprados (sem tubo e sem peças impressas): para contar à parte. */
+export function comprados(p: Projeto, d: Design): LinhaBom[] {
+  return bom(p, d).slice(1 + d.pecas.length)
 }
 
 function encaixesPorPeca(tipo: string): number {

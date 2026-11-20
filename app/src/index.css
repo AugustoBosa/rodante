@@ -339,7 +339,7 @@ tr:hover td { background: var(--papel-2); }
 .peca:hover, .peca:focus-within { border-color: var(--azul); background: color-mix(in srgb, var(--azul-claro) 40%, var(--papel)); }
 .peca .mini { position: relative; height: 116px; background: var(--papel-2); border-radius: 2px; }
 .peca h3 { margin: 0; }
-.peca .qtd { font-weight: 900; font-stretch: 62%; font-size: 2rem; line-height: 1; color: var(--azul); }
+.peca .qtd { font-weight: 900; font-stretch: 62%; font-size: 2rem; line-height: 1; color: var(--tinta); }
 .montagem { padding-left: 0; list-style: none; counter-reset: m; margin: 0; }
 .montagem li { counter-increment: m; display: grid; grid-template-columns: 44px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--cinza-2); }
 .montagem li::before { content: counter(m); font-weight: 900; font-stretch: 62%; font-size: 2rem; line-height: 1; }
@@ -364,9 +364,10 @@ tr:hover td { background: var(--papel-2); }
 /* miniatura isométrica: tubo = traço preto com miolo de papel */
 .miniatura { display: block; width: 100%; height: 160px; }
 .miniatura .tubo-fora { stroke: var(--tinta); }
-.miniatura .tubo-dentro { stroke: var(--papel); }
-.miniatura .roda { fill: var(--papel); stroke: var(--tinta); }
-.miniatura .junta { fill: var(--azul); }
+.miniatura .tubo-dentro { stroke: var(--cinza-1); }
+.miniatura .roda { fill: var(--cinza-3); stroke: var(--tinta); }
+.miniatura .cubo { fill: var(--papel); stroke: var(--tinta); }
+.miniatura .junta { stroke: var(--tinta); }
 @media (prefers-reduced-motion: no-preference) {
   .cartao-projeto .miniatura .tubo-dentro { transition: stroke 0.3s; }
   .cartao-projeto:hover .miniatura .tubo-dentro { stroke: var(--azul-claro); }
@@ -448,3 +449,13 @@ tr:hover td { background: var(--papel-2); }
   .aba { display: block !important; page-break-inside: avoid; }
   .lateral { border: 0; overflow: visible; position: static; }
 }
+
+/* ---------- inventário: cor da peça e itens comprados ---------- */
+.amostra { display: inline-block; width: 0.8em; height: 0.8em; margin-right: 0.45em; border: 1.5px solid var(--tinta); border-radius: 2px; vertical-align: -0.05em; }
+.sub-inventario { margin: clamp(32px, 4vw, 48px) 0 14px; font-size: 1.25rem; font-weight: 820; font-stretch: 112%; }
+.comprados { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); border-top: var(--traco) solid var(--tinta); border-left: var(--traco) solid var(--tinta); }
+.comprados li { display: grid; grid-template-columns: minmax(64px, auto) 1fr; gap: 12px; align-items: center; padding: 12px 14px; border-right: var(--traco) solid var(--tinta); border-bottom: var(--traco) solid var(--tinta); min-width: 0; }
+.comprados b { white-space: nowrap; font-weight: 900; font-stretch: 62%; font-size: 1.9rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.comprados strong { display: block; font-size: 0.98rem; }
+.comprados small { display: block; color: var(--tinta-2); font-size: 0.86rem; }
+.cortes { margin-top: 0; }

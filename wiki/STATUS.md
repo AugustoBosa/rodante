@@ -48,6 +48,8 @@
 - **Idiomas:** pt-BR e inglês via `tr('pt', 'en')` em `app/src/i18n.ts`; padrão pelo navegador; botão no topo.
 - **Grafo:** graphify com Haiku na extração semântica (pedido do usuário).
 - **Visual (2026-11-20, rodada 4):** mundo "manual de montagem" escolhido pelo usuário (impeccable): papel branco, traço preto, 3 cinzas, um azul só para "esta peça / sua medida / ação", vermelho só para erro. Fonte Archivo (auto-hospedada via `@fontsource-variable/archivo`), ícones `lucide-react`. 3D em toon + contorno, câmera ortográfica isométrica. Contexto em `PRODUCT.md` e `.impeccable/surfaces/`.
+- **Cores das peças (pedido do usuário):** cada tipo de peça impressa tem uma cor (`app/src/ui/coresPecas.ts`), igual no 3D, inventário, lista e miniaturas; azul continua só para destaque/ação. Traço fino (1–1,6 px).
+- **Cão na cadeira:** escala pela perna que define o trilho (trilho logo abaixo da barriga); patas apoiadas nas rodas não andam (trilhas da animação removidas). Cintas da sela, arnês e ligações desenhadas em 3D; fita e velcro calculados em `cintas()` (`model/bom.ts`, comprimentos estimados).
 - **Cão:** Shiba Inu 3D de Quaternius (CC0) em `app/public/modelos/shiba.glb`; reserva 2D com silhueta CC0 (Margot Michaud, PhyloPic). Créditos em `app/public/modelos/LICENCAS.txt` e no rodapé.
 
 ## Mapa do código (`app/src/`)

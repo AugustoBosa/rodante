@@ -2,13 +2,14 @@ import { forwardRef, Suspense, useEffect, useImperativeHandle, useMemo, useRef, 
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Bounds, Html, Line, OrbitControls } from '@react-three/drei'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
-import { Box3, BufferAttribute, BufferGeometry, Matrix4, Quaternion, Vector3, type Group } from 'three'
+import { Box3, BufferAttribute, BufferGeometry, CatmullRomCurve3, Matrix4, Quaternion, Vector3, type Group } from 'three'
 import type { ShapeMesh } from 'replicad'
 import type { Design, Medidas, TipoCadeira, V3 } from '../model/types'
 import { tr } from '../i18n'
 import { COR, DepoisDoPrimeiroQuadro, Tinta } from './tinta3d'
 import { Cao3D, useCao } from './Cao3D'
 import { movimentoReduzido } from './tela'
+import { COR_CINTA, corPeca } from './coresPecas'
 
 function useGeometria(mesh: ShapeMesh) {
   return useMemo(() => {
@@ -56,7 +57,7 @@ function Tubo({ a, b, r }: { a: V3; b: V3; r: number }) {
   return (
     <mesh position={meio} quaternion={quat}>
       <cylinderGeometry args={[r, r, comp, 20]} />
-      <Tinta cor={COR.cinza1} />
+      <Tinta cor={COR.cinza1} traco={1} />
     </mesh>
   )
 }
@@ -71,11 +72,11 @@ function Roda({ pos, d, largura, andar }: { pos: V3; d: number; largura: number;
       <group ref={g}>
         <mesh>
           <cylinderGeometry args={[d / 2, d / 2, largura, 40]} />
-          <Tinta cor={COR.cinza3} />
+          <Tinta cor={COR.cinza3} traco={1} />
         </mesh>
         <mesh>
           <cylinderGeometry args={[d / 3.2, d / 3.2, largura + 2, 24]} />
-          <Tinta cor={COR.papel} traco={1.5} />
+          <Tinta cor={COR.papel} traco={1} />
         </mesh>
         {[0, 1, 2].map((i) => (
           <mesh key={i} rotation-y={(i * Math.PI) / 3} position={[0, 0, 0]}>
@@ -100,15 +101,66 @@ function Cota({ de, ate, texto }: { de: V3; ate: V3; texto: string }) {
   )
 }
 
-/** Cão dentro do quadro: quadril sobre o eixo (traseira) ou ombro sobre o eixo dianteiro. */
-function CaoNoQuadro({ med, d, tipo, andar }: { med: Medidas; d: Design; tipo: TipoCadeira; andar: boolean }) {
-  const cao = useCao(med)
-  const eixo = Math.min(...d.rodas.map((r) => r.pos[0]))
-  const ombro = tipo === 'traseira' ? eixo - cao.marcos.quadril : eixo
+/** Fita de nylon passando pelos pontos (tubo fino, cor de tecido). */
+function Cinta({ pontos, fechada = false }: { pontos: V3[]; fechada?: boolean }) {
+  const curva = useMemo(() => new CatmullRomCurve3(pontos.map((p) => new Vector3(...p)), fechada), [pontos, fechada])
   return (
-    <group position={[ombro, 0, 0]}>
-      <Cao3D cao={cao} anim={andar ? 'Walk' : 'Idle'} />
-    </group>
+    <mesh>
+      <tubeGeometry args={[curva, 64, 5, 8, fechada]} />
+      <Tinta cor={COR_CINTA} traco={1} />
+    </mesh>
+  )
+}
+
+/**
+ * Cão dentro do quadro: quadril sobre o eixo (traseira) ou ombro sobre o eixo dianteiro. As patas apoiadas
+ * nas rodas não andam. Desenha as cintas da sela (uma por par de clips, por baixo da barriga) e o arnês
+ * (peitoral ou de quadril) ligado às ponteiras.
+ */
+function CaoNoQuadro({ med, d, tipo, andar }: { med: Medidas; d: Design; tipo: TipoCadeira; andar: boolean }) {
+  const cao = useCao(med, tipo)
+  const m = cao.marcos
+  const eixo = Math.min(...d.rodas.map((r) => r.pos[0]))
+  const ombro = tipo === 'traseira' ? eixo - m.quadril : eixo
+  const H = d.cotas.alturaTrilho
+  const cintas = useMemo(() => {
+    const yC = Math.abs(d.juntas.find((j) => j.spec.tipo === 'clipSela')?.pos[1] ?? d.cotas.larguraInterna / 2)
+    const barriga = () => m.barriga - 6 // a cinta encosta por baixo da barriga
+    const meia = m.largura * 0.36
+    const xs = [...new Set(d.juntas.filter((j) => j.spec.tipo === 'clipSela' && j.pos[1] < 0).map((j) => Math.round(j.pos[0] + 17)))]
+    const sela: V3[][] = xs.map((x) => {
+      const z = barriga()
+      return [[x, -yC, H], [x, -meia, z + 18], [x, 0, z], [x, meia, z + 18], [x, yC, H]]
+    })
+    // arnês: anel no peito (ponteiras na frente) ou no quadril (ponteiras atrás), ligado às ponteiras
+    const pont = d.juntas.filter((j) => j.spec.tipo === 'ponteira')
+    if (!pont.length) return { sela, anel: null, ligas: [] as V3[][] }
+    const naFrente = pont[0].pos[0] < ombro + m.quadril / 2
+    const xa = naFrente ? ombro + m.quadril * 0.1 : ombro + m.quadril * 0.95
+    const base = naFrente ? m.axila : m.virilha
+    const cz = (base + m.costas) / 2
+    const rz = (m.costas - base) / 2 + 10
+    const ry = m.largura / 2 + 10
+    const anel: V3[] = Array.from({ length: 16 }, (_, i) => {
+      const a = (i / 16) * Math.PI * 2
+      return [xa, ry * Math.cos(a), cz + rz * Math.sin(a)]
+    })
+    const ligas: V3[][] = pont.map((j) => [j.pos, [xa, Math.sign(j.pos[1]) * ry, cz - rz * 0.3]])
+    return { sela, anel, ligas }
+  }, [d, m, ombro, H])
+  return (
+    <>
+      <group position={[ombro, 0, 0]}>
+        <Cao3D cao={cao} anim={andar ? 'Walk' : 'Idle'} parado={tipo} />
+      </group>
+      {cintas.sela.map((p, i) => (
+        <Cinta key={`s${i}`} pontos={p} />
+      ))}
+      {cintas.anel && <Cinta pontos={cintas.anel} fechada />}
+      {cintas.ligas.map((p, i) => (
+        <Cinta key={`l${i}`} pontos={p} />
+      ))}
+    </>
   )
 }
 
@@ -218,7 +270,7 @@ export const Vista3D = forwardRef<Vista3DHandle, Props>(function Vista3D(
         const chave = JSON.stringify(j.spec)
         // vista explodida: conexões se afastam do centro do quadro, tubos ficam no lugar
         const pos: V3 = [j.pos[0] + (j.pos[0] - centro.x) * 0.3 * e, j.pos[1] * (1 + 0.6 * e), j.pos[2] + (j.pos[2] - c.alturaTrilho / 2) * 0.4 * e]
-        return <Junta key={i} mesh={meshes[chave]} pos={pos} ex={j.ex} ey={j.ey} r={tuboD * 0.9} cor={destaque === chave ? COR.azul : COR.papel} />
+        return <Junta key={i} mesh={meshes[chave]} pos={pos} ex={j.ex} ey={j.ey} r={tuboD * 0.9} cor={destaque === chave ? COR.azul : corPeca(j.spec)} />
       })}
       {d.rodas.map((r, i) => (
         <Roda key={i} pos={[r.pos[0], r.pos[1] * (1 + 0.6 * e), r.pos[2]]} d={r.d} largura={r.largura} andar={anima && andar} />
@@ -253,7 +305,7 @@ function Acordar({ ativo }: { ativo: boolean }) {
 }
 
 /** Miniatura de uma peça: enquadrada sozinha, girando devagar quando visível. */
-export function MiniPeca({ mesh, rotulo, cor = COR.papel, ativo = true }: { mesh: ShapeMesh; rotulo: string; cor?: string; ativo?: boolean }) {
+export function MiniPeca({ mesh, rotulo, cor, ativo = true }: { mesh: ShapeMesh; rotulo: string; cor?: string; ativo?: boolean }) {
   const geo = useGeometria(mesh)
   return (
     <Canvas className="cena" frameloop={ativo && !movimentoReduzido() ? 'always' : 'demand'} dpr={[1, 2]} camera={{ position: [60, -80, 60], up: [0, 0, 1], fov: 30 }} aria-label={rotulo} gl={{ preserveDrawingBuffer: true }}>
@@ -262,7 +314,7 @@ export function MiniPeca({ mesh, rotulo, cor = COR.papel, ativo = true }: { mesh
       <Bounds fit clip observe margin={1.9}>
         <Giro>
           <mesh geometry={geo}>
-            <Tinta cor={cor} traco={1.6} />
+            <Tinta cor={cor} traco={1} />
           </mesh>
         </Giro>
       </Bounds>

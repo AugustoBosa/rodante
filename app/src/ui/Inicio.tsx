@@ -5,7 +5,7 @@ import { gravarRascunho, lerRascunho } from '../store'
 import { ir } from '../rota'
 import { tr } from '../i18n'
 import { computeDesign, LETRA_TIPO, TIPOS } from '../model/design'
-import { cortes, montagem } from '../model/bom'
+import { comprados, cortes, montagem } from '../model/bom'
 import type { TipoCadeira } from '../model/types'
 import { projetoProvisorio } from './exemplo'
 import { movimentoReduzido, tem3D, useVisivel } from './tela'
@@ -165,6 +165,19 @@ export function Inicio() {
             ))}
           </ul>
         )}
+        <h3 className="sub-inventario">{tr('Comprado pronto', 'Bought ready-made')}</h3>
+        <ul className="comprados">
+          {comprados(p, d).map((l) => (
+            <li key={l.item}>
+              <b>{l.un === 'm' ? `${String(l.qtd).replace('.', tr(',', '.'))} m` : `×${l.qtd}`}</b>
+              <span>
+                <strong>{l.item}</strong>
+                <small>{l.especificacao}</small>
+              </span>
+            </li>
+          ))}
+        </ul>
+        <h3 className="sub-inventario">{tr('Cortes de tubo, em escala', 'Tube cuts, to scale')}</h3>
         <div className="cortes" aria-label={tr('Cortes de tubo, desenhados em escala', 'Tube cuts, drawn to scale')}>
           {tubos.map((t) => (
             <div key={t.nome + t.comprimento} className="corte">

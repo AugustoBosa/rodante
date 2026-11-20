@@ -4,6 +4,7 @@ import { Carregando } from './Carregando'
 import { Campo } from './Campo'
 import { MiniPeca, Vista3D, type Vista, type Vista3DHandle } from './Vista3D'
 import { usePecas } from './usePecas'
+import { corPeca } from './coresPecas'
 import { cad } from '../cad/cliente'
 import { computeDesign, medidasDoTipo, TIPOS, validarCampo } from '../model/design'
 import { bom, cortes, csv, montagem } from '../model/bom'
@@ -359,11 +360,11 @@ function PranchaProjeto({ p, setP }: { p: Projeto; setP: (f: (x: Projeto) => Pro
                       onBlur={() => setDestaque(null)}
                     >
                       <div className="mini">
-                        {r ? <MiniPeca mesh={r.mesh} rotulo={`${tr('Prévia', 'Preview')}: ${pc.nome}`} ativo={destaque === pc.chave} /> : <span className="mudo" style={{ display: 'block', padding: 8 }}>{tr('desenhando…', 'drawing…')}</span>}
+                        {r ? <MiniPeca mesh={r.mesh} cor={corPeca(pc.spec)} rotulo={`${tr('Prévia', 'Preview')}: ${pc.nome}`} ativo={destaque === pc.chave} /> : <span className="mudo" style={{ display: 'block', padding: 8 }}>{tr('desenhando…', 'drawing…')}</span>}
                       </div>
                       <div>
                         <div className="qtd">×{pc.qtd}</div>
-                        <h3>{pc.nome}</h3>
+                        <h3><span className="amostra" style={{ background: corPeca(pc.spec) }} aria-hidden="true" />{pc.nome}</h3>
                         <p className="mudo" style={{ fontSize: '0.9rem' }}>{DICA_IMPRESSAO[pc.spec.tipo]}</p>
                         <div className="acoes">
                           <button className="btn btn-pequeno nao-imprimir" disabled={!r} onClick={() => r && baixar(nomeStl(pc), r.stl)}>STL</button>

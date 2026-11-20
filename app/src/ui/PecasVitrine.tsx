@@ -3,6 +3,7 @@ import { DICA_IMPRESSAO } from '../saidas'
 import { tr } from '../i18n'
 import { MiniPeca } from './Vista3D'
 import { usePecas } from './usePecas'
+import { corPeca } from './coresPecas'
 
 /** Inventário das peças impressas, cada uma girando em 3D quando o motor CAD termina. */
 export default function PecasVitrine({ d, ligar }: { d: Design; ligar: boolean }) {
@@ -14,13 +15,13 @@ export default function PecasVitrine({ d, ligar }: { d: Design; ligar: boolean }
           <div className="mini">
             <span className="qtd" aria-label={tr(`${pc.qtd} unidades`, `${pc.qtd} units`)}>×{pc.qtd}</span>
             {pecas[pc.chave] ? (
-              <MiniPeca mesh={pecas[pc.chave].mesh} rotulo={pc.nome} />
+              <MiniPeca mesh={pecas[pc.chave].mesh} cor={corPeca(pc.spec)} rotulo={pc.nome} />
             ) : (
               <span className="esboco">{carga < 1 ? tr(`motor de desenho ${Math.round(carga * 100)}%`, `drawing engine ${Math.round(carga * 100)}%`) : tr('desenhando…', 'drawing…')}</span>
             )}
           </div>
           <div className="legenda">
-            <h3>{pc.nome}</h3>
+            <h3><span className="amostra" style={{ background: corPeca(pc.spec) }} aria-hidden="true" />{pc.nome}</h3>
             <p>{DICA_IMPRESSAO[pc.spec.tipo]}</p>
           </div>
         </li>

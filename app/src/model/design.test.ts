@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import { computeDesign, recuo } from './design'
-import { bom, cortes, csv } from './bom'
+import { bom, cintas, comprados, cortes, csv } from './bom'
 import { AJUSTES_PADRAO, MATERIAIS_PADRAO } from './defaults'
 import type { Projeto } from './types'
 
@@ -99,4 +99,16 @@ test('quatro rodas: dois eixos, duas barras, sem ponteira, nivelado pela perna m
   expect(d.cotas.alturaTrilho).toBe((35 - AJUSTES_PADRAO.ajusteAlturaCm) * 10)
   const torto = computeDesign({ ...p, medidas: { ...p.medidas, alturaPernaDianteiraCm: 50 } })
   expect(torto.alertas.some((a) => a.texto.includes('muito diferentes'))).toBe(true)
+})
+
+test('cintas: uma por par de clips, uma ligação por ponteira, fita somada na lista', () => {
+  const d = computeDesign(srd)
+  const c = cintas(srd, d)
+  expect(c.sela).toBe(2) // traseira: 2 pares de clips
+  expect(c.ligacoes).toBe(2) // 2 ponteiras → peitoral
+  expect(c.selaMm).toBe(Math.round(240 * 1.6 + 2 * 30 + 160))
+  expect(c.fitaM).toBeCloseTo(Math.ceil(((2 * c.selaMm + 2 * c.ligacaoMm) * 1.1) / 100) / 10)
+  const fita = comprados(srd, d).find((l) => l.un === 'm')!
+  expect(fita.qtd).toBe(c.fitaM)
+  expect(comprados(srd, d).some((l) => /impresso|printed/.test(l.item))).toBe(false)
 })
