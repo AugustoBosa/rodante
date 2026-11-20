@@ -1,10 +1,10 @@
 # Rodante
 
-Site gratuito e de código aberto que gera o projeto de uma **cadeira de rodas traseira para cães** a partir das medidas do animal. A pessoa informa 4 medidas e os materiais que tem e recebe:
+Site gratuito e de código aberto que gera o projeto de uma **cadeira de rodas para cães** (traseira, dianteira ou de 4 rodas) a partir das medidas do animal. Em português e inglês. A pessoa informa as medidas e os materiais que tem e recebe:
 
-- modelo 3D do quadro com cotas;
+- modelo 3D do quadro com cotas e vista explodida;
 - lista de materiais (BOM) e lista de cortes de tubo (CSV);
-- arquivos **STL** das conexões impressas: tê, cotovelo, suporte do eixo, ponteira e clip da sela;
+- arquivos **STL** das conexões impressas (tê, cotovelo, suporte do eixo, ponteira, clip da sela) e **STEP** de cada peça e do conjunto montado;
 - passo a passo de montagem e alertas de segurança;
 - um pacote `.zip` com tudo, um link compartilhável e a prancha pronta para imprimir em PDF.
 
@@ -37,6 +37,8 @@ No ar em **https://augustobosa.github.io/rodante/**. O GitHub Pages publica a br
 | `app/src/cad/` | Peças em Replicad (`pecas.ts`), rodando num Web Worker (`worker.ts`) |
 | `app/src/ui/` | Telas: início, wizard, prancha técnica com 3D, meus projetos |
 | `app/src/store.ts` | localStorage, link compartilhável e validação de dados importados |
+| `app/src/i18n.ts` | Português/inglês: cada texto leva as duas versões, `tr('pt', 'en')` |
+| `graphify-out/` | Grafo de conhecimento local (fora do git), atualizado a cada commit |
 | `wiki/` | Pesquisa de apoio (medidas, biomecânica, materiais, licenças) |
 | `docs/` | Proposta de interface e plano de execução |
 

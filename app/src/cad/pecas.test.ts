@@ -1,7 +1,7 @@
 import { beforeAll, expect, test } from 'vitest'
 import init from 'replicad-opencascadejs'
 import { measureVolume, setOC } from 'replicad'
-import { construir } from './pecas'
+import { construir, eixoAngulo } from './pecas'
 import { raioExterno, raioInterno, recuo } from '../model/design'
 import type { SpecPeca } from '../model/types'
 
@@ -56,4 +56,38 @@ test('ponteira, clip e STL de todas as peças', () => {
     expect(measureVolume(peca)).toBeGreaterThan(1000)
     expect(peca.blobSTL({ binary: true }).size).toBeGreaterThan(5_000)
   }
+})
+
+test('eixoAngulo reproduz a base ao girar os eixos do mundo', () => {
+  const girar = (v: number[], eixo: number[], grausAng: number) => {
+    // Rodrigues
+    const a = (grausAng * Math.PI) / 180
+    const [kx, ky, kz] = eixo
+    const n = Math.hypot(kx, ky, kz)
+    const k = [kx / n, ky / n, kz / n]
+    const dot = k[0] * v[0] + k[1] * v[1] + k[2] * v[2]
+    const cr = [k[1] * v[2] - k[2] * v[1], k[2] * v[0] - k[0] * v[2], k[0] * v[1] - k[1] * v[0]]
+    return v.map((vi, i) => vi * Math.cos(a) + cr[i] * Math.sin(a) + k[i] * dot * (1 - Math.cos(a)))
+  }
+  const bases: [number[], number[]][] = [
+    [[1, 0, 0], [0, 1, 0]],
+    [[0, 0, 1], [0, 1, 0]],
+    [[-1, 0, 0], [0, 1, 0]],
+    [[-1, 0, 0], [0, -1, 0]],
+    [[1, 0, 0], [0, 0, -1]],
+    [[0, 0, 1], [-1, 0, 0]],
+    [[0, 0, 1], [0, -1, 0]],
+  ]
+  for (const [ex, ey] of bases) {
+    const { angulo, eixo } = eixoAngulo(ex as never, ey as never)
+    const gx = girar([1, 0, 0], eixo, angulo)
+    const gy = girar([0, 1, 0], eixo, angulo)
+    ex.forEach((v, i) => expect(gx[i]).toBeCloseTo(v, 6))
+    ey.forEach((v, i) => expect(gy[i]).toBeCloseTo(v, 6))
+  }
+})
+
+test('STEP de uma peça sai como texto ISO-10303', async () => {
+  const txt = await construir({ tipo: 'te', angulo: 90, ...imp }).blobSTEP().text()
+  expect(txt.startsWith('ISO-10303-21')).toBe(true)
 })

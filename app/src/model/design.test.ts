@@ -12,7 +12,7 @@ const projeto = (over: { peso: number; raca: string; perna: number; comp: number
   cao: { nome: 'Teste', raca: over.raca, pesoKg: over.peso },
   tipo: 'traseira',
   metodoMedida: 'deitado-de-lado',
-  medidas: { alturaPernaCm: over.perna, comprimentoCm: over.comp, larguraCm: over.larg, alturaCostasCm: over.costas },
+  medidas: { alturaPernaCm: over.perna, alturaPernaDianteiraCm: 0, comprimentoCm: over.comp, larguraCm: over.larg, alturaCostasCm: over.costas },
   materiais: { ...MATERIAIS_PADRAO, ...mat },
   ajustes: AJUSTES_PADRAO,
   avisoVet: true,
@@ -75,4 +75,28 @@ test('cortes somam os tubos; BOM e CSV saem', () => {
   expect(linhas.find((l) => l.item.startsWith('Parafuso de trava'))!.qtd).toBe(2 * 3 + 4 * 3 + 2 * 2 + 2 + 2)
   const texto = csv(linhas as never)
   expect(texto.startsWith('﻿item;especificacao;qtd;un;obs')).toBe(true)
+})
+
+test('dianteira: espelho da traseira, ponteira atrás e barra na frente', () => {
+  const p: Projeto = { ...srd, tipo: 'dianteira', medidas: { ...srd.medidas, alturaPernaDianteiraCm: 36 } }
+  const d = computeDesign(p)
+  expect(erros(p)).toEqual([])
+  expect(d.tubos).toHaveLength(13)
+  expect(d.tubos.some((t) => t.nome === 'Barra dianteira')).toBe(true)
+  expect(d.cotas.alturaTrilho).toBe((36 - AJUSTES_PADRAO.ajusteAlturaCm) * 10)
+  expect(d.rodas.every((r) => r.pos[0] === AJUSTES_PADRAO.extensaoTraseiraMm)).toBe(true) // eixo sob o ombro
+})
+
+test('quatro rodas: dois eixos, duas barras, sem ponteira, nivelado pela perna mais curta', () => {
+  const p: Projeto = { ...srd, tipo: 'quatro', medidas: { ...srd.medidas, alturaPernaDianteiraCm: 38 } }
+  const d = computeDesign(p)
+  expect(erros(p)).toEqual([])
+  expect(d.rodas).toHaveLength(4)
+  expect(d.tubos).toHaveLength(24)
+  for (const t of d.tubos) expect(t.comprimento).toBeGreaterThanOrEqual(20)
+  const qtd = Object.fromEntries(d.pecas.map((pc) => [pc.nome, pc.qtd]))
+  expect(qtd).toEqual({ 'Tê 90°': 4, 'Tê 45°': 8, 'Cotovelo 90°': 4, 'Suporte do eixo': 4, 'Clip da sela': 8 })
+  expect(d.cotas.alturaTrilho).toBe((35 - AJUSTES_PADRAO.ajusteAlturaCm) * 10)
+  const torto = computeDesign({ ...p, medidas: { ...p.medidas, alturaPernaDianteiraCm: 50 } })
+  expect(torto.alertas.some((a) => a.texto.includes('muito diferentes'))).toBe(true)
 })

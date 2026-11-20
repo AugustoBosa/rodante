@@ -86,3 +86,27 @@ export function construir(s: SpecPeca): Shape3D {
       return clipSela(s)
   }
 }
+
+type V = [number, number, number]
+
+/**
+ * Base local (ex, ey, ez = ex×ey) → rotação eixo-ângulo (graus) que leva os eixos do mundo até ela.
+ * Usado para posicionar as peças no STEP do conjunto.
+ */
+export function eixoAngulo(ex: V, ey: V): { angulo: number; eixo: V } {
+  const ez: V = [ex[1] * ey[2] - ex[2] * ey[1], ex[2] * ey[0] - ex[0] * ey[2], ex[0] * ey[1] - ex[1] * ey[0]]
+  // R[i][j] = componente i da coluna j (colunas = ex, ey, ez)
+  const R = [0, 1, 2].map((i) => [ex[i], ey[i], ez[i]])
+  const cos = (R[0][0] + R[1][1] + R[2][2] - 1) / 2
+  const ang = Math.acos(Math.min(1, Math.max(-1, cos)))
+  if (ang < 1e-9) return { angulo: 0, eixo: [0, 0, 1] }
+  if (Math.PI - ang < 1e-6) {
+    // 180°: R = 2uuᵀ − I
+    const i = [0, 1, 2].reduce((a, b) => (R[b][b] > R[a][a] ? b : a), 0)
+    const ui = Math.sqrt((R[i][i] + 1) / 2)
+    const u = [0, 1, 2].map((j) => (j === i ? ui : R[i][j] / (2 * ui))) as V
+    return { angulo: 180, eixo: u }
+  }
+  const s = 2 * Math.sin(ang)
+  return { angulo: (ang * 180) / Math.PI, eixo: [(R[2][1] - R[1][2]) / s, (R[0][2] - R[2][0]) / s, (R[1][0] - R[0][1]) / s] }
+}

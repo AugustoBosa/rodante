@@ -5,6 +5,7 @@ import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import { BufferAttribute, BufferGeometry, Matrix4, Quaternion, Vector3 } from 'three'
 import type { ShapeMesh } from 'replicad'
 import type { Design, V3 } from '../model/types'
+import { tr } from '../i18n'
 
 const COR_PECA = '#f2b705'
 const COR_TUBO = '#c3ccd0'
@@ -86,9 +87,10 @@ interface Props {
   meshes: Record<string, ShapeMesh>
   tuboD: number
   cotas: boolean
+  explodir?: boolean
 }
 
-export const Vista3D = forwardRef<Vista3DHandle, Props>(function Vista3D({ design: d, meshes, tuboD, cotas }, ref) {
+export const Vista3D = forwardRef<Vista3DHandle, Props>(function Vista3D({ design: d, meshes, tuboD, cotas, explodir }, ref) {
   const ctl = useRef<OrbitControlsImpl>(null)
   const c = d.cotas
   const centro = useMemo(() => new Vector3(c.comprimentoTrilho / 2, 0, c.alturaTrilho / 2), [c.comprimentoTrilho, c.alturaTrilho])
@@ -127,7 +129,7 @@ export const Vista3D = forwardRef<Vista3DHandle, Props>(function Vista3D({ desig
       frameloop="demand"
       gl={{ preserveDrawingBuffer: true, antialias: true }}
       camera={{ position: inicio.toArray(), up: [0, 0, 1], fov: 35, near: 1, far: 20000 }}
-      aria-label="Modelo 3D do quadro. Arraste para girar, role para aproximar."
+      aria-label={tr('Modelo 3D do quadro. Arraste para girar, role para aproximar.', 'Frame 3D model. Drag to rotate, scroll to zoom.')}
     >
       <hemisphereLight args={['#ffffff', '#8a949a', 1.1]} />
       <directionalLight position={[-300, -500, 900]} intensity={1.6} />
@@ -137,10 +139,12 @@ export const Vista3D = forwardRef<Vista3DHandle, Props>(function Vista3D({ desig
       ))}
       {d.juntas.map((j, i) => {
         const m = meshes[JSON.stringify(j.spec)]
-        return m ? <Junta key={i} mesh={m} pos={j.pos} ex={j.ex} ey={j.ey} /> : null
+        // vista explodida: conexões se afastam do centro do quadro, tubos ficam no lugar
+        const pos: V3 = explodir ? [j.pos[0] + (j.pos[0] - centro.x) * 0.3, j.pos[1] * 1.35, j.pos[2] + (j.pos[2] - centro.z) * 0.3] : j.pos
+        return m ? <Junta key={i} mesh={m} pos={pos} ex={j.ex} ey={j.ey} /> : null
       })}
       {d.rodas.map((r, i) => (
-        <group key={i} position={r.pos}>
+        <group key={i} position={explodir ? [r.pos[0], r.pos[1] * 1.35, r.pos[2]] : r.pos}>
           <mesh>
             <cylinderGeometry args={[r.d / 2, r.d / 2, r.largura, 48]} />
             <meshStandardMaterial color="#2b3134" roughness={0.9} />
@@ -153,10 +157,10 @@ export const Vista3D = forwardRef<Vista3DHandle, Props>(function Vista3D({ desig
       ))}
       {cotas && (
         <DepoisDoPrimeiroQuadro>
-          <Cota de={[0, yCota, -10]} ate={[c.comprimentoTrilho, yCota, -10]} texto={`comprimento ${c.comprimentoTrilho} mm`} />
-          <Cota de={[c.comprimentoTrilho + 50, -yC, c.alturaTrilho]} ate={[c.comprimentoTrilho + 50, yC, c.alturaTrilho]} texto={`entre trilhos ${Math.round(2 * yC)} mm`} />
-          <Cota de={[-50, yCota, 0]} ate={[-50, yCota, c.alturaTrilho]} texto={`altura ${c.alturaTrilho} mm`} />
-          <Cota de={[c.comprimentoTrilho / 2, -c.larguraTotal / 2, 0]} ate={[c.comprimentoTrilho / 2, c.larguraTotal / 2, 0]} texto={`largura total ${c.larguraTotal} mm`} />
+          <Cota de={[0, yCota, -10]} ate={[c.comprimentoTrilho, yCota, -10]} texto={`${tr('comprimento', 'length')} ${c.comprimentoTrilho} mm`} />
+          <Cota de={[c.comprimentoTrilho + 50, -yC, c.alturaTrilho]} ate={[c.comprimentoTrilho + 50, yC, c.alturaTrilho]} texto={`${tr('entre trilhos', 'between rails')} ${Math.round(2 * yC)} mm`} />
+          <Cota de={[-50, yCota, 0]} ate={[-50, yCota, c.alturaTrilho]} texto={`${tr('altura', 'height')} ${c.alturaTrilho} mm`} />
+          <Cota de={[c.comprimentoTrilho / 2, -c.larguraTotal / 2, 0]} ate={[c.comprimentoTrilho / 2, c.larguraTotal / 2, 0]} texto={`${tr('largura total', 'overall width')} ${c.larguraTotal} mm`} />
         </DepoisDoPrimeiroQuadro>
       )}
       <OrbitControls ref={ctl} makeDefault target={centro} />

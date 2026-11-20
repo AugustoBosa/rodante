@@ -11,7 +11,7 @@ const p: Projeto = {
   cao: { nome: 'Pipoca', raca: 'dachshund', pesoKg: 8 },
   tipo: 'traseira',
   metodoMedida: 'deitado-de-lado',
-  medidas: { alturaPernaCm: 18, comprimentoCm: 35, larguraCm: 16, alturaCostasCm: 22 },
+  medidas: { alturaPernaCm: 18, alturaPernaDianteiraCm: 0, comprimentoCm: 35, larguraCm: 16, alturaCostasCm: 22 },
   materiais: MATERIAIS_PADRAO,
   ajustes: AJUSTES_PADRAO,
   avisoVet: true,

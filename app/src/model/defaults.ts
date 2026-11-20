@@ -6,6 +6,7 @@ export const LIMITE_PESO_KG = 40 // acima disso: recomendar fabricante profissio
 export const SEGMENTO_MIN_MM = 20 // tubo mais curto que isso não monta
 export const FOLGA_LATERAL_MIN_CM = 1.5
 export const PVC_PESO_MAX_KG = 12
+export const DIFERENCA_PERNAS_MAX = 0.15 // 4 rodas: acima disso o quadro nivelado fica torto para o cão
 
 // ponytail: tabela heurística peso → Ø mínimo de tubo de alumínio; trocar por teste de carga
 export const TUBO_MIN_POR_PESO: [pesoAteKg: number, tuboMinD: number][] = [
@@ -38,12 +39,13 @@ export const AJUSTES_PADRAO: Ajustes = {
   profundidade: 30,
 }
 
-export const MEDIDAS_VAZIAS: Medidas = { alturaPernaCm: 0, comprimentoCm: 0, larguraCm: 0, alturaCostasCm: 0 }
+export const MEDIDAS_VAZIAS: Medidas = { alturaPernaCm: 0, alturaPernaDianteiraCm: 0, comprimentoCm: 0, larguraCm: 0, alturaCostasCm: 0 }
 
 /** Faixas aceitas na entrada [min, max]. Fora disso o campo é inválido. */
 export const LIMITES = {
   pesoKg: [1, 80],
   alturaPernaCm: [8, 80],
+  alturaPernaDianteiraCm: [8, 80],
   comprimentoCm: [15, 110],
   larguraCm: [8, 60],
   alturaCostasCm: [15, 100],

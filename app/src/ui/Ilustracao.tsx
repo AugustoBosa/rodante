@@ -1,5 +1,7 @@
+import { tr } from '../i18n'
+
 // Cão em silhueta com a "fita métrica" amarela marcando onde medir.
-export type QualMedida = 'alturaPerna' | 'comprimento' | 'largura' | 'alturaCostas'
+export type QualMedida = 'alturaPerna' | 'alturaPernaDianteira' | 'comprimento' | 'largura' | 'alturaCostas'
 
 const CHAO = 184
 
@@ -85,11 +87,15 @@ function Cima() {
 }
 
 const DESCRICAO: Record<QualMedida | 'todas', string> = {
-  alturaPerna: 'Cão de lado. Fita vertical da prega onde a coxa encontra o corpo até o chão, na pata traseira.',
-  comprimento: 'Cão de lado. Fita horizontal do meio do ombro ao meio do quadril.',
-  largura: 'Cão visto de cima. Fita atravessando o ponto mais largo do corpo.',
-  alturaCostas: 'Cão de lado. Fita vertical da linha das costas até o chão.',
-  todas: 'Cão de lado com três fitas métricas: altura da perna traseira, comprimento do ombro ao quadril e altura das costas.',
+  alturaPerna: tr('Cão de lado. Fita vertical da prega onde a coxa encontra o corpo até o chão, na pata traseira.', 'Dog from the side. Vertical tape from the crease where the thigh meets the body down to the ground, on the hind leg.'),
+  alturaPernaDianteira: tr('Cão de lado. Fita vertical da axila até o chão, na pata dianteira.', 'Dog from the side. Vertical tape from the armpit down to the ground, on the front leg.'),
+  comprimento: tr('Cão de lado. Fita horizontal do meio do ombro ao meio do quadril.', 'Dog from the side. Horizontal tape from mid shoulder to mid hip.'),
+  largura: tr('Cão visto de cima. Fita atravessando o ponto mais largo do corpo.', 'Dog seen from above. Tape across the widest point of the body.'),
+  alturaCostas: tr('Cão de lado. Fita vertical da linha das costas até o chão.', 'Dog from the side. Vertical tape from the back line down to the ground.'),
+  todas: tr(
+    'Cão de lado com três fitas métricas: altura da perna traseira, comprimento do ombro ao quadril e altura das costas.',
+    'Dog from the side with three tape measures: hind leg height, shoulder-to-hip length and back height.',
+  ),
 }
 
 export function Ilustracao({ medida }: { medida: QualMedida | 'todas' }) {
@@ -100,7 +106,7 @@ export function Ilustracao({ medida }: { medida: QualMedida | 'todas' }) {
       {medida === 'largura' ? (
         <>
           <Cima />
-          <Fita x1={190} y1={70} x2={190} y2={130} rotulo="largura" />
+          <Fita x1={190} y1={70} x2={190} y2={130} rotulo={tr('largura', 'width')} />
         </>
       ) : (
         <>
@@ -108,17 +114,23 @@ export function Ilustracao({ medida }: { medida: QualMedida | 'todas' }) {
           {ver('alturaPerna') && (
             <>
               <line x1={234} x2={268} y1={100} y2={100} {...tracejado} />
-              <Fita x1={268} y1={100} x2={268} y2={CHAO} rotulo="perna" />
+              <Fita x1={268} y1={100} x2={268} y2={CHAO} rotulo={tr('perna', 'leg')} />
+            </>
+          )}
+          {medida === 'alturaPernaDianteira' && (
+            <>
+              <line x1={84} x2={110} y1={114} y2={114} {...tracejado} />
+              <Fita x1={84} y1={114} x2={84} y2={CHAO} rotulo={tr('perna', 'leg')} lado={-1} />
             </>
           )}
           {ver('comprimento') && (
             <>
               <line x1={112} x2={112} y1={56} y2={74} {...tracejado} />
               <line x1={222} x2={222} y1={56} y2={84} {...tracejado} />
-              <Fita x1={112} y1={56} x2={222} y2={56} rotulo="ombro → quadril" />
+              <Fita x1={112} y1={56} x2={222} y2={56} rotulo={tr('ombro → quadril', 'shoulder → hip')} />
             </>
           )}
-          {ver('alturaCostas') && <Fita x1={170} y1={72} x2={170} y2={CHAO} rotulo="costas" lado={-1} />}
+          {ver('alturaCostas') && <Fita x1={170} y1={72} x2={170} y2={CHAO} rotulo={tr('costas', 'back')} lado={-1} />}
         </>
       )}
     </svg>

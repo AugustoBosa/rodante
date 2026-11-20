@@ -48,7 +48,17 @@ Nome provisório: **Rodante**. Rodar: `cd app && npm run dev`. Testes: `npm test
 1. **Usuário:** imprimir o cotovelo/tê, testar o encaixe e ajustar `folgaImpressao` em `defaults.ts`.
 2. Valores sem fonte (Ø tubo por peso, folga lateral, limite 40 kg, PVC ≤ 12 kg): validar com montagem real e, se possível, fisioterapeuta veterinário.
 3. ~~Publicar~~ Feito em 2026-11-20: repositório https://github.com/AugustoBosa/rodante (público), site https://augustobosa.github.io/rodante/ servido da branch `gh-pages`, atualizada pelo workflow a cada push em `master`.
-4. Não feito (YAGNI por ora): vista explodida, miniatura 3D na lista de projetos, export STEP, cadeira dianteira/4 rodas.
+4. ~~Não feito: vista explodida, miniatura, STEP, dianteira/4 rodas~~ Feito na rodada 3.
+
+## Rodada 3 (2026-11-20)
+- **Nome definitivo:** Rodante.
+- **Novos tipos:** cadeira dianteira e de 4 rodas (`design.ts` gera eixos, diagonais, barras e ponteiras conforme o tipo; medida nova `alturaPernaDianteiraCm`).
+- **STEP:** por peça e do conjunto montado (`cad/worker.ts` → `conjunto`), também dentro do .zip.
+- **Vista explodida** na prancha e **miniatura isométrica** (SVG) na lista de projetos.
+- **Tela de carregamento** com a roda andando na fita, com o progresso real do download do motor (22 MB, ~7 MB comprimido).
+- **Inglês:** `app/src/i18n.ts`, botão no topo, padrão pelo idioma do navegador.
+- **Grafo graphify** em `graphify-out/` (Haiku na extração semântica). O hook `post-commit` atualiza o código; docs mudados pedem `/graphify . --update` com Haiku.
+- Branch `feat/app-rodante` apagada. Favicon do Vite trocado pelo ícone do Rodante.
 
 ## Próximo passo sugerido
-Montar uma cadeira de teste com os STLs gerados e calibrar `defaults.ts` (o push em `master` republica o site).
+Montar uma cadeira de teste com os STLs gerados e calibrar `defaults.ts` (sem pressa: usuário não vai imprimir agora). Pendências da pesquisa na wiki ficam para depois.

@@ -1,3 +1,7 @@
 {
-  "userIgnoreFilters": ["app/", "docs/"]
+  "userIgnoreFilters": [
+    "app/",
+    "docs/",
+    "graphify-out/"
+  ]
 }

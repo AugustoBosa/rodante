@@ -8,7 +8,8 @@ export interface Cao {
 
 /** Medidas do cão em cm, método "deitado de lado" (ver wiki 02). */
 export interface Medidas {
-  alturaPernaCm: number // prega da coxa → almofada da pata, deitado de lado
+  alturaPernaCm: number // traseira: prega da coxa → almofada da pata, deitado de lado
+  alturaPernaDianteiraCm: number // dianteira: axila → almofada da pata, deitado de lado
   comprimentoCm: number // meio do ombro → meio do quadril
   larguraCm: number // ponto mais largo do corpo
   alturaCostasCm: number // costas → chão, em pé
@@ -35,13 +36,15 @@ export interface Ajustes {
   profundidade: number // mm que o tubo entra na conexão
 }
 
+export type TipoCadeira = 'traseira' | 'dianteira' | 'quatro'
+
 export interface Projeto {
   versao: 1
   id: string
   criadoEm: string
   atualizadoEm: string
   cao: Cao
-  tipo: 'traseira'
+  tipo: TipoCadeira
   metodoMedida: 'deitado-de-lado'
   medidas: Medidas
   materiais: Materiais

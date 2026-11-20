@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { tr } from '../i18n'
 
 interface Props {
   rotulo: string
@@ -21,7 +22,7 @@ export function Campo({ rotulo, valor, onChange, unidade, ajuda, erro, passo = 0
     <div className="campo" data-erro={!!erro}>
       <label htmlFor={cid}>
         {rotulo}
-        {unidade && <span className="visualmente-oculto"> em {unidade}</span>}
+        {unidade && <span className="visualmente-oculto"> {tr('em', 'in')} {unidade}</span>}
       </label>
       <div className="entrada">
         <input

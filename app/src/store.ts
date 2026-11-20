@@ -2,6 +2,7 @@
 import { deflateSync, inflateSync, strFromU8, strToU8 } from 'fflate'
 import type { Projeto } from './model/types'
 import { AJUSTES_PADRAO, MATERIAIS_PADRAO } from './model/defaults'
+import { tr } from './i18n'
 
 const CHAVE = 'rodante.projetos'
 const RASCUNHO = 'rodante.rascunho'
@@ -39,7 +40,7 @@ export function excluir(id: string) {
 
 export function duplicar(p: Projeto): Projeto {
   const agora = new Date().toISOString()
-  const copia = { ...p, id: novoId(), criadoEm: agora, cao: { ...p.cao, nome: `${p.cao.nome} (cópia)` } }
+  const copia = { ...p, id: novoId(), criadoEm: agora, cao: { ...p.cao, nome: `${p.cao.nome} ${tr('(cópia)', '(copy)')}` } }
   salvar(copia)
   return copia
 }
@@ -93,6 +94,7 @@ export function validarProjeto(x: unknown): Projeto | null {
   if (o.versao !== 1 || !cao || !md) return null
   const medidas = {
     alturaPernaCm: num(md.alturaPernaCm),
+    alturaPernaDianteiraCm: num(md.alturaPernaDianteiraCm, 0),
     comprimentoCm: num(md.comprimentoCm),
     larguraCm: num(md.larguraCm),
     alturaCostasCm: num(md.alturaCostasCm),
@@ -106,8 +108,8 @@ export function validarProjeto(x: unknown): Projeto | null {
     id: str(o.id, 20).replace(/[^\w-]/g, '') || novoId(),
     criadoEm: str(o.criadoEm, 40),
     atualizadoEm: str(o.atualizadoEm, 40),
-    cao: { nome: str(cao.nome) || 'Sem nome', raca: str(cao.raca, 30), pesoKg },
-    tipo: 'traseira',
+    cao: { nome: str(cao.nome) || tr('Sem nome', 'Unnamed'), raca: str(cao.raca, 30), pesoKg },
+    tipo: o.tipo === 'dianteira' || o.tipo === 'quatro' ? o.tipo : 'traseira',
     metodoMedida: 'deitado-de-lado',
     medidas: medidas as Projeto['medidas'],
     materiais: {
