@@ -5,4 +5,5 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   base: './', // hospedagem estática em subpasta (GitHub Pages)
   plugins: [react()],
+  build: { chunkSizeWarningLimit: 1100 }, // prancha (three.js) carrega sob demanda; o WASM do CAD é separado
 })

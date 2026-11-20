@@ -35,5 +35,20 @@ Fases: F0 setup → F1 spike CAD (cotovelo impresso) → F2 modelo → F3 wizard
 - Impressão: a peça sai deitada (braços na horizontal) e precisa de suporte. Avaliar base plana em F5.
 - **Pendente (usuário):** imprimir o cotovelo, testar encaixe no tubo real e anotar a folga que funcionou.
 
+## F2–F7 — App completo (2026-11-20)
+Nome provisório: **Rodante**. Rodar: `cd app && npm run dev`. Testes: `npm test` (16).
+- **F2 modelo:** `app/src/model/` — `design.ts` (quadro traseiro: 2 laterais com trilho + perna + diagonal 45°, barra traseira; cortes = distância entre centros − recuos), `bom.ts` (BOM, cortes, montagem, CSV), `defaults.ts` (todos os botões de calibração).
+- **F5 peças:** `app/src/cad/pecas.ts` — cotovelo, tê (90°/45°), suporte do eixo, ponteira com passador, clip da sela. Worker com cache.
+- **F3 wizard:** 5 passos, fita métrica nas ilustrações SVG, validação, raças (`data/racas.ts`, faixas AKC aprox.), rascunho salvo.
+- **F4 prancha:** 3D (tubos + peças + rodas + cotas), vistas, Simples/Avançado, abas Materiais/Cortes/Peças/Montagem/Alertas.
+- **F6 saídas:** .zip (STLs + CSVs + projeto.json + LEIA-ME), CSV, impressão em PDF, link `#/p/…`, Meus projetos (duplicar, importar, exportar).
+- **F7:** Lighthouse a11y/boas práticas/SEO = 100 na prancha; README; `.github/workflows/deploy.yml` (GitHub Pages). Build de produção testado em subpasta.
+
+### Pendências
+1. **Usuário:** imprimir o cotovelo/tê, testar o encaixe e ajustar `folgaImpressao` em `defaults.ts`.
+2. Valores sem fonte (Ø tubo por peso, folga lateral, limite 40 kg, PVC ≤ 12 kg): validar com montagem real e, se possível, fisioterapeuta veterinário.
+3. Publicar: criar repositório no GitHub, dar push e ativar Pages (Settings → Pages → GitHub Actions).
+4. Não feito (YAGNI por ora): vista explodida, miniatura 3D na lista de projetos, export STEP, cadeira dianteira/4 rodas.
+
 ## Próximo passo sugerido
-Com a folga calibrada: F2 — modelo paramétrico (`types.ts`, `design.ts`, `bom.ts`, `defaults.ts`) + testes.
+Montar uma cadeira de teste com os STLs gerados e calibrar `defaults.ts`; depois publicar.
