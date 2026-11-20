@@ -47,8 +47,8 @@ Nome provisório: **Rodante**. Rodar: `cd app && npm run dev`. Testes: `npm test
 ### Pendências
 1. **Usuário:** imprimir o cotovelo/tê, testar o encaixe e ajustar `folgaImpressao` em `defaults.ts`.
 2. Valores sem fonte (Ø tubo por peso, folga lateral, limite 40 kg, PVC ≤ 12 kg): validar com montagem real e, se possível, fisioterapeuta veterinário.
-3. Publicar: criar repositório no GitHub, dar push e ativar Pages (Settings → Pages → GitHub Actions).
+3. ~~Publicar~~ Feito em 2026-11-20: repositório https://github.com/AugustoBosa/rodante (público), site https://augustobosa.github.io/rodante/ servido da branch `gh-pages`, atualizada pelo workflow a cada push em `master`.
 4. Não feito (YAGNI por ora): vista explodida, miniatura 3D na lista de projetos, export STEP, cadeira dianteira/4 rodas.
 
 ## Próximo passo sugerido
-Montar uma cadeira de teste com os STLs gerados e calibrar `defaults.ts`; depois publicar.
+Montar uma cadeira de teste com os STLs gerados e calibrar `defaults.ts` (o push em `master` republica o site).
