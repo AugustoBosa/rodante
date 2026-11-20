@@ -31,13 +31,17 @@ export function Miniatura({ p }: { p: Projeto }) {
   return (
     <svg viewBox={vb.join(' ')} className="miniatura" role="img" aria-label={tr(`Desenho do quadro de ${p.cao.nome}`, `Frame drawing for ${p.cao.nome}`)}>
       {rodas.map((pts, i) => (
-        <polygon key={i} points={pts.map((q) => q.join(',')).join(' ')} fill="var(--tinta)" opacity={0.85} />
+        <polygon key={i} className="roda" points={pts.map((q) => q.join(',')).join(' ')} strokeWidth={esp * 0.35} />
+      ))}
+      {/* tubo de manual: traço preto largo + miolo de papel por cima */}
+      {tubos.map(([a, b], i) => (
+        <line key={`f${i}`} className="tubo-fora" x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} strokeWidth={esp * 1.5} strokeLinecap="round" />
       ))}
       {tubos.map(([a, b], i) => (
-        <line key={i} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke="var(--aluminio)" strokeWidth={esp} strokeLinecap="round" />
+        <line key={`d${i}`} className="tubo-dentro" x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} strokeWidth={esp * 0.75} strokeLinecap="round" />
       ))}
       {juntas.map((q, i) => (
-        <circle key={i} cx={q[0]} cy={q[1]} r={esp * 0.9} fill="var(--fita)" />
+        <circle key={i} className="junta" cx={q[0]} cy={q[1]} r={esp * 0.85} />
       ))}
     </svg>
   )

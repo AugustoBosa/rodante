@@ -1,90 +1,12 @@
+import { useId } from 'react'
 import { tr } from '../i18n'
 
-// Cão em silhueta com a "fita métrica" amarela marcando onde medir.
+// Reserva 2D do palco de medidas (sem WebGL, aparelho fraco, impressão, enquanto o 3D carrega).
+// Silhueta CC0 de Margot Michaud (PhyloPic), espelhada para a cabeça ficar à esquerda como no 3D.
 export type QualMedida = 'alturaPerna' | 'alturaPernaDianteira' | 'comprimento' | 'largura' | 'alturaCostas'
 
-const CHAO = 184
-
-function Fita({ x1, y1, x2, y2, rotulo, lado = 1 }: { x1: number; y1: number; x2: number; y2: number; rotulo: string; lado?: 1 | -1 }) {
-  const vertical = x1 === x2
-  const comp = vertical ? y2 - y1 : x2 - x1
-  const ticks = []
-  for (let t = 3; t < comp; t += 6) {
-    const grande = Math.round(t / 6) % 5 === 0
-    const l = grande ? 6 : 3
-    ticks.push(
-      vertical ? (
-        <line key={t} x1={x1 - 4.5} x2={x1 - 4.5 + l} y1={y1 + t} y2={y1 + t} />
-      ) : (
-        <line key={t} y1={y1 - 4.5} y2={y1 - 4.5 + l} x1={x1 + t} x2={x1 + t} />
-      ),
-    )
-  }
-  return (
-    <g>
-      {vertical ? <rect x={x1 - 4.5} y={y1} width={9} height={comp} fill="var(--fita)" /> : <rect x={x1} y={y1 - 4.5} width={comp} height={9} fill="var(--fita)" />}
-      <g stroke="#1f2a2e" strokeWidth={0.8} opacity={0.7}>{ticks}</g>
-      <g stroke="#1f2a2e" strokeWidth={2.5}>
-        {vertical ? (
-          <>
-            <line x1={x1 - 8} x2={x1 + 8} y1={y1} y2={y1} />
-            <line x1={x1 - 8} x2={x1 + 8} y1={y2} y2={y2} />
-          </>
-        ) : (
-          <>
-            <line y1={y1 - 8} y2={y1 + 8} x1={x1} x2={x1} />
-            <line y1={y1 - 8} y2={y1 + 8} x1={x2} x2={x2} />
-          </>
-        )}
-      </g>
-      <text
-        x={vertical ? x1 + lado * 12 : (x1 + x2) / 2}
-        y={vertical ? (y1 + y2) / 2 : y1 - 12}
-        textAnchor={vertical ? (lado === 1 ? 'start' : 'end') : 'middle'}
-        dominantBaseline="middle"
-        fontFamily="var(--mono)"
-        fontSize={11}
-        fontWeight={600}
-        fill="var(--tinta)"
-      >
-        {rotulo}
-      </text>
-    </g>
-  )
-}
-
-const tracejado = { stroke: 'var(--tinta)', strokeWidth: 1, strokeDasharray: '3 3', opacity: 0.6 }
-
-function Lado() {
-  return (
-    <g fill="var(--tinta-2)" opacity={0.32}>
-      <rect x={92} y={72} width={150} height={56} rx={28} />
-      <ellipse cx={118} cy={104} rx={34} ry={32} />
-      <polygon points="100,86 66,50 90,36 128,78" />
-      <ellipse cx={72} cy={50} rx={24} ry={20} />
-      <ellipse cx={50} cy={58} rx={16} ry={10} />
-      <rect x={104} y={118} width={13} height={66} rx={6} />
-      <rect x={126} y={118} width={12} height={66} rx={6} opacity={0.6} />
-      <ellipse cx={222} cy={112} rx={28} ry={30} />
-      <rect x={218} y={128} width={13} height={56} rx={6} />
-      <rect x={200} y={128} width={12} height={56} rx={6} opacity={0.6} />
-      <path d="M240 88 q30 -10 34 -42" fill="none" stroke="var(--tinta-2)" strokeWidth={8} strokeLinecap="round" />
-    </g>
-  )
-}
-
-function Cima() {
-  return (
-    <g fill="var(--tinta-2)" opacity={0.32}>
-      <ellipse cx={170} cy={100} rx={80} ry={30} />
-      <ellipse cx={72} cy={100} rx={22} ry={17} />
-      <ellipse cx={52} cy={100} rx={12} ry={9} />
-      <ellipse cx={82} cy={83} rx={8} ry={5} />
-      <ellipse cx={82} cy={117} rx={8} ry={5} />
-      <path d="M248 100 q25 0 42 -12" fill="none" stroke="var(--tinta-2)" strokeWidth={8} strokeLinecap="round" />
-    </g>
-  )
-}
+const SILHUETA = `${import.meta.env.BASE_URL}modelos/cao-lado.svg`
+const CHAO = 527
 
 const DESCRICAO: Record<QualMedida | 'todas', string> = {
   alturaPerna: tr('Cão de lado. Fita vertical da prega onde a coxa encontra o corpo até o chão, na pata traseira.', 'Dog from the side. Vertical tape from the crease where the thigh meets the body down to the ground, on the hind leg.'),
@@ -92,47 +14,91 @@ const DESCRICAO: Record<QualMedida | 'todas', string> = {
   comprimento: tr('Cão de lado. Fita horizontal do meio do ombro ao meio do quadril.', 'Dog from the side. Horizontal tape from mid shoulder to mid hip.'),
   largura: tr('Cão visto de cima. Fita atravessando o ponto mais largo do corpo.', 'Dog seen from above. Tape across the widest point of the body.'),
   alturaCostas: tr('Cão de lado. Fita vertical da linha das costas até o chão.', 'Dog from the side. Vertical tape from the back line down to the ground.'),
-  todas: tr(
-    'Cão de lado com três fitas métricas: altura da perna traseira, comprimento do ombro ao quadril e altura das costas.',
-    'Dog from the side with three tape measures: hind leg height, shoulder-to-hip length and back height.',
-  ),
+  todas: tr('Cão de lado com as fitas métricas de perna, comprimento e costas.', 'Dog from the side with the leg, length and back tape measures.'),
 }
 
-export function Ilustracao({ medida }: { medida: QualMedida | 'todas' }) {
-  const ver = (m: QualMedida) => medida === m || medida === 'todas'
+/** Fita reta com pontas e marcas, em coordenadas do desenho. */
+function Fita({ x1, y1, x2, y2, rotulo }: { x1: number; y1: number; x2: number; y2: number; rotulo: string }) {
+  const vert = x1 === x2
+  const comp = Math.abs(vert ? y2 - y1 : x2 - x1)
+  const marcas = []
+  for (let t = 12; t < comp; t += 12) marcas.push(t)
+  const [ox, oy] = [Math.min(x1, x2), Math.min(y1, y2)]
   return (
-    <svg viewBox="0 0 320 200" role="img" aria-label={DESCRICAO[medida]}>
-      <line x1={10} x2={310} y1={CHAO} y2={CHAO} stroke="var(--tinta)" strokeWidth={1.5} />
-      {medida === 'largura' ? (
+    <g>
+      <rect x={vert ? x1 - 7 : ox} y={vert ? oy : y1 - 7} width={vert ? 14 : comp} height={vert ? comp : 14} fill="var(--azul)" />
+      <g stroke="var(--papel)" strokeWidth={1.6}>
+        {marcas.map((t) => (vert ? <line key={t} x1={x1 - 7} x2={x1 - (t % 60 ? 2 : -1)} y1={oy + t} y2={oy + t} /> : <line key={t} y1={y1 - 7} y2={y1 - (t % 60 ? 2 : -1)} x1={ox + t} x2={ox + t} />))}
+      </g>
+      <g stroke="var(--tinta)" strokeWidth={4}>
+        {vert ? (
+          <>
+            <line x1={x1 - 16} x2={x1 + 16} y1={y1} y2={y1} />
+            <line x1={x1 - 16} x2={x1 + 16} y1={y2} y2={y2} />
+          </>
+        ) : (
+          <>
+            <line y1={y1 - 16} y2={y1 + 16} x1={x1} x2={x1} />
+            <line y1={y1 - 16} y2={y1 + 16} x1={x2} x2={x2} />
+          </>
+        )}
+      </g>
+      <text x={vert ? x1 + 20 : (x1 + x2) / 2} y={vert ? (y1 + y2) / 2 : y1 - 22} textAnchor={vert ? 'start' : 'middle'} dominantBaseline="middle" fontSize={26} fontWeight={800} fill="var(--azul)">
+        {rotulo}
+      </text>
+    </g>
+  )
+}
+
+const guia = { stroke: 'var(--tinta)', strokeWidth: 2, strokeDasharray: '6 6' }
+
+export function Ilustracao({ medida }: { medida: QualMedida | 'todas' }) {
+  const mascara = useId()
+  const ver =(m: QualMedida) => medida === m || medida === 'todas'
+  if (medida === 'largura')
+    return (
+      <svg className="ilustracao" viewBox="0 0 640 420" role="img" aria-label={DESCRICAO.largura}>
+        <g fill="var(--cinza-1)" stroke="var(--tinta)" strokeWidth={3}>
+          <path d="M520 210 q60 -10 90 -60" fill="none" strokeWidth={14} strokeLinecap="round" />
+          <ellipse cx={340} cy={210} rx={200} ry={78} />
+          <ellipse cx={130} cy={210} rx={62} ry={50} />
+          <ellipse cx={72} cy={210} rx={34} ry={22} />
+        </g>
+        <Fita x1={360} y1={120} x2={360} y2={300} rotulo={tr('largura', 'width')} />
+        <text x={320} y={392} textAnchor="middle" fontSize={22} fill="var(--tinta-2)">{tr('visto de cima', 'seen from above')}</text>
+      </svg>
+    )
+  return (
+    <svg className="ilustracao" viewBox="-20 -10 740 570" role="img" aria-label={DESCRICAO[medida]}>
+      <defs>
+        <mask id={mascara} style={{ maskType: 'alpha' }}>
+          <g transform="translate(600 0) scale(-1 1)">
+            <image href={SILHUETA} width={600} height={526.6} />
+          </g>
+        </mask>
+      </defs>
+      <rect x={0} y={0} width={600} height={527} fill="var(--cinza-2)" mask={`url(#${CSS.escape(mascara)})`} />
+      <line x1={-20} x2={720} y1={CHAO} y2={CHAO} stroke="var(--tinta)" strokeWidth={3} />
+      {ver('alturaPernaDianteira') && medida !== 'todas' && (
         <>
-          <Cima />
-          <Fita x1={190} y1={70} x2={190} y2={130} rotulo={tr('largura', 'width')} />
-        </>
-      ) : (
-        <>
-          <Lado />
-          {ver('alturaPerna') && (
-            <>
-              <line x1={234} x2={268} y1={100} y2={100} {...tracejado} />
-              <Fita x1={268} y1={100} x2={268} y2={CHAO} rotulo={tr('perna', 'leg')} />
-            </>
-          )}
-          {medida === 'alturaPernaDianteira' && (
-            <>
-              <line x1={84} x2={110} y1={114} y2={114} {...tracejado} />
-              <Fita x1={84} y1={114} x2={84} y2={CHAO} rotulo={tr('perna', 'leg')} lado={-1} />
-            </>
-          )}
-          {ver('comprimento') && (
-            <>
-              <line x1={112} x2={112} y1={56} y2={74} {...tracejado} />
-              <line x1={222} x2={222} y1={56} y2={84} {...tracejado} />
-              <Fita x1={112} y1={56} x2={222} y2={56} rotulo={tr('ombro → quadril', 'shoulder → hip')} />
-            </>
-          )}
-          {ver('alturaCostas') && <Fita x1={170} y1={72} x2={170} y2={CHAO} rotulo={tr('costas', 'back')} lado={-1} />}
+          <line x1={110} x2={205} y1={325} y2={325} {...guia} />
+          <Fita x1={110} y1={325} x2={110} y2={CHAO} rotulo={tr('perna', 'leg')} />
         </>
       )}
+      {ver('alturaPerna') && (
+        <>
+          <line x1={470} x2={600} y1={280} y2={280} {...guia} />
+          <Fita x1={600} y1={280} x2={600} y2={CHAO} rotulo={tr('perna', 'leg')} />
+        </>
+      )}
+      {ver('comprimento') && (
+        <>
+          <line x1={175} x2={175} y1={95} y2={175} {...guia} />
+          <line x1={490} x2={490} y1={95} y2={160} {...guia} />
+          <Fita x1={175} y1={95} x2={490} y2={95} rotulo={tr('ombro → quadril', 'shoulder → hip')} />
+        </>
+      )}
+      {ver('alturaCostas') && <Fita x1={330} y1={155} x2={330} y2={CHAO} rotulo={tr('costas', 'back')} />}
     </svg>
   )
 }

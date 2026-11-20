@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
-import type { ShapeMesh } from 'replicad'
-import { proxy } from 'comlink'
+import { Box, Dog, Download, Expand, Info, Link2, OctagonAlert, Printer, Ruler, SlidersHorizontal, TriangleAlert } from 'lucide-react'
 import { Carregando } from './Carregando'
 import { Campo } from './Campo'
 import { MiniPeca, Vista3D, type Vista, type Vista3DHandle } from './Vista3D'
+import { usePecas } from './usePecas'
 import { cad } from '../cad/cliente'
 import { computeDesign, medidasDoTipo, TIPOS, validarCampo } from '../model/design'
 import { bom, cortes, csv, montagem } from '../model/bom'
@@ -16,14 +16,15 @@ import { baixar, DICA_IMPRESSAO, linhasCortes, nomeStl, pacoteZip, slug } from '
 
 type Aba = 'bom' | 'cortes' | 'pecas' | 'montagem' | 'alertas'
 const ABAS: [Aba, string][] = [
+  ['pecas', tr('Peças', 'Parts')],
   ['bom', tr('Materiais', 'Materials')],
   ['cortes', tr('Cortes', 'Cuts')],
-  ['pecas', tr('Peças', 'Parts')],
   ['montagem', tr('Montagem', 'Assembly')],
   ['alertas', tr('Alertas', 'Alerts')],
 ]
-const VISTAS: Record<Vista, string> = { iso: '3D', lado: tr('Lado', 'Side'), frente: tr('Frente', 'Front'), topo: tr('Topo', 'Top') }
+const VISTAS: Record<Vista, string> = { iso: '3D', tras: tr('Trás', 'Rear'), lado: tr('Lado', 'Side'), frente: tr('Frente', 'Front'), topo: tr('Topo', 'Top') }
 const NIVEL: Record<string, string> = { erro: tr('erro', 'error'), aviso: tr('aviso', 'warning'), info: 'info' }
+const ICONE_NIVEL = { erro: OctagonAlert, aviso: TriangleAlert, info: Info }
 
 type NomeCampo = keyof typeof LIMITES
 const CAMPOS_MEDIDAS: [keyof Medidas, string][] = [
@@ -64,7 +65,7 @@ export default function Prancha({ id }: { id: string }) {
   const [p, setP] = useState(() => obter(id))
   if (!p)
     return (
-      <div className="pagina vazio">
+      <div className="projetos vazio">
         <h1>{tr('Projeto não encontrado', 'Project not found')}</h1>
         <p>
           {tr(
@@ -82,14 +83,13 @@ export default function Prancha({ id }: { id: string }) {
 
 function PranchaProjeto({ p, setP }: { p: Projeto; setP: (f: (x: Projeto) => Projeto) => void }) {
   const [modo, setModo] = useState<'simples' | 'avancado'>('simples')
-  const [aba, setAba] = useState<Aba>('bom')
-  const [cotas, setCotas] = useState(true)
-  const [explodir, setExplodir] = useState(false)
+  const [aba, setAba] = useState<Aba>('pecas')
   const [largo] = useState(() => matchMedia('(min-width: 1101px)').matches) // celular: parâmetros começam fechados
+  const [cotas, setCotas] = useState(largo) // celular: cotas começam desligadas (poluem a tela pequena)
+  const [explodir, setExplodir] = useState(false)
+  const [verCao, setVerCao] = useState(true)
+  const [destaque, setDestaque] = useState<string | null>(null)
   const [status, setStatus] = useState(tr('Salvo neste navegador', 'Saved in this browser'))
-  const [pecas, setPecas] = useState<Record<string, { mesh: ShapeMesh; stl: Blob }>>({})
-  const [erroCad, setErroCad] = useState('')
-  const [carga, setCarga] = useState(0)
   const vista = useRef<Vista3DHandle>(null)
   const ultimo = useRef<Design | null>(null)
 
@@ -97,13 +97,7 @@ function PranchaProjeto({ p, setP }: { p: Projeto; setP: (f: (x: Projeto) => Pro
   const d = useMemo(() => (ruins.length ? ultimo.current : computeDesign(p)), [p, ruins.length])
   if (d) ultimo.current = d
   const erros = d?.alertas.filter((a) => a.nivel === 'erro') ?? []
-  const chaves = d?.pecas.map((pc) => pc.chave).join('|') ?? ''
-  const prontas = !!d && d.pecas.every((pc) => pecas[pc.chave])
-
-  // baixa o motor de desenho uma vez, informando o progresso
-  useEffect(() => {
-    cad.iniciar(proxy((f: number) => setCarga(f))).catch((e) => setErroCad(String(e)))
-  }, [])
+  const { pecas, meshes, erro: erroCad, carga, prontas, feitas } = usePecas(d)
 
   // salva automático
   useEffect(() => {
@@ -111,25 +105,6 @@ function PranchaProjeto({ p, setP }: { p: Projeto; setP: (f: (x: Projeto) => Pro
     return () => clearTimeout(t)
   }, [p])
 
-  // gera as peças no worker (com espera curta para não recalcular a cada tecla)
-  useEffect(() => {
-    if (!d) return
-    let vivo = true
-    const t = setTimeout(() => {
-      for (const pc of d.pecas)
-        cad
-          .peca(pc.spec)
-          .then((r) => vivo && setPecas((x) => ({ ...x, [pc.chave]: r })))
-          .catch((e) => vivo && setErroCad(tr(`Falha ao gerar ${pc.nome}: ${e}`, `Failed to generate ${pc.nome}: ${e}`)))
-    }, 300)
-    return () => {
-      vivo = false
-      clearTimeout(t)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chaves])
-
-  const meshes = useMemo(() => Object.fromEntries(Object.entries(pecas).map(([k, v]) => [k, v.mesh])), [pecas])
   const nomeArq = slug(p.cao.nome)
 
   async function baixarTudo() {
@@ -176,33 +151,40 @@ function PranchaProjeto({ p, setP }: { p: Projeto; setP: (f: (x: Projeto) => Pro
   }
 
   const raca = RACAS.find((r) => r.id === p.cao.raca)
+  const nAlertas = d?.alertas.filter((a) => a.nivel !== 'info').length ?? 0
 
   return (
     <div className="prancha">
       <div className="prancha-topo">
         <div>
           <h1>{p.cao.nome}</h1>
-          <span className="mudo mono" style={{ fontSize: '0.85rem' }}>
-            {TIPOS.find((t) => t.id === p.tipo)!.nome.toLowerCase()} · {raca ? nomeRaca(raca) : tr('raça não informada', 'breed not given')} · {p.cao.pesoKg} kg
+          <span className="ficha">
+            {TIPOS.find((t) => t.id === p.tipo)!.nome} · {raca ? nomeRaca(raca) : tr('raça não informada', 'breed not given')} · {p.cao.pesoKg} kg
           </span>
         </div>
         <div className="acoes">
-          <span className="mudo" role="status" aria-live="polite" style={{ fontSize: '0.9rem' }}>{status}</span>
-          <button className="btn btn-primario btn-pequeno" onClick={baixarTudo} disabled={!prontas || erros.length > 0} title={erros.length ? tr('Corrija os erros antes de baixar', 'Fix the errors before downloading') : undefined}>
+          <span className="status" role="status" aria-live="polite">{status}</span>
+          <button className="btn btn-primario" onClick={baixarTudo} disabled={!prontas || erros.length > 0} title={erros.length ? tr('Corrija os erros antes de baixar', 'Fix the errors before downloading') : undefined}>
+            <Download className="ico" aria-hidden="true" />
             {prontas ? tr('Baixar pacote (.zip)', 'Download package (.zip)') : tr('Gerando peças…', 'Generating parts…')}
           </button>
           <button className="btn btn-pequeno" onClick={copiarLink}>
+            <Link2 className="ico" aria-hidden="true" />
             {tr('Copiar link', 'Copy link')}
           </button>
           <button className="btn btn-pequeno" onClick={() => print()}>
-            {tr('Imprimir prancha', 'Print drawing')}
+            <Printer className="ico" aria-hidden="true" />
+            {tr('Imprimir', 'Print')}
           </button>
         </div>
       </div>
 
       <aside className="painel" aria-label={tr('Parâmetros do projeto', 'Project parameters')}>
         <details open={largo}>
-          <summary>{tr('Parâmetros', 'Parameters')}</summary>
+          <summary>
+            <SlidersHorizontal className="ico" aria-hidden="true" />
+            {tr('Parâmetros', 'Parameters')}
+          </summary>
           <div className="alternador" role="group" aria-label={tr('Nível de detalhe', 'Detail level')}>
             <button aria-pressed={modo === 'simples'} onClick={() => setModo('simples')}>
               {tr('Simples', 'Simple')}
@@ -216,7 +198,7 @@ function PranchaProjeto({ p, setP }: { p: Projeto; setP: (f: (x: Projeto) => Pro
             <div className="campo">
               <label htmlFor="p-nome">{tr('Nome', 'Name')}</label>
               <div className="entrada">
-                <input id="p-nome" type="text" value={p.cao.nome} onChange={(e) => setCao({ nome: e.target.value })} style={{ fontFamily: 'var(--texto)' }} />
+                <input id="p-nome" type="text" value={p.cao.nome} onChange={(e) => setCao({ nome: e.target.value })} />
               </div>
             </div>
             <Campo rotulo={tr('Peso', 'Weight')} unidade="kg" valor={p.cao.pesoKg} onChange={(pesoKg) => setCao({ pesoKg })} erro={validarCampo('pesoKg', p.cao.pesoKg)} />
@@ -267,28 +249,54 @@ function PranchaProjeto({ p, setP }: { p: Projeto; setP: (f: (x: Projeto) => Pro
       </aside>
 
       <section className="vista" aria-label={tr('Modelo 3D', '3D model')}>
-        <div className="vista-controles">
-          {(['iso', 'lado', 'frente', 'topo'] as Vista[]).map((v) => (
+        {verCao && (
+          <p className="aproximado">
+            <Dog className="ico" aria-hidden="true" />
+            {tr('Cão em posição aproximada, só para dar escala.', 'Dog in an approximate position, for scale only.')}
+          </p>
+        )}
+        {d && (
+          <Vista3D
+            ref={vista}
+            design={d}
+            meshes={meshes}
+            tuboD={p.materiais.tuboD}
+            tipo={p.tipo}
+            cotas={cotas}
+            explodir={explodir ? 1 : 0}
+            cao={verCao && !explodir ? p.medidas : null}
+            destaque={destaque}
+          />
+        )}
+        <div className="vista-controles" role="toolbar" aria-label={tr('Controles da vista', 'View controls')}>
+          {(['iso', 'tras', 'lado', 'frente', 'topo'] as Vista[]).map((v) => (
             <button key={v} className="btn btn-pequeno" onClick={() => vista.current?.olhar(v)}>
+              {v === 'iso' && <Box className="ico" aria-hidden="true" />}
               {VISTAS[v]}
             </button>
           ))}
+          <span className="sep" aria-hidden="true" />
           <button className="btn btn-pequeno" aria-pressed={cotas} onClick={() => setCotas(!cotas)}>
-            {cotas ? tr('Cotas ligadas', 'Dimensions on') : tr('Cotas desligadas', 'Dimensions off')}
+            <Ruler className="ico" aria-hidden="true" />
+            {tr('Cotas', 'Dimensions')}
           </button>
           <button className="btn btn-pequeno" aria-pressed={explodir} onClick={() => setExplodir(!explodir)}>
-            {explodir ? tr('Juntar peças', 'Collapse view') : tr('Vista explodida', 'Exploded view')}
+            <Expand className="ico" aria-hidden="true" />
+            {tr('Explodir', 'Explode')}
+          </button>
+          <button className="btn btn-pequeno" aria-pressed={verCao} onClick={() => setVerCao(!verCao)} title={tr('Mostrar o cão na cadeira', 'Show the dog in the cart')}>
+            <Dog className="ico" aria-hidden="true" />
+            {tr('Cão', 'Dog')}
           </button>
         </div>
-        {d && <Vista3D ref={vista} design={d} meshes={meshes} tuboD={p.materiais.tuboD} cotas={cotas} explodir={explodir} />}
         {!prontas && !erroCad && d && (
           <Carregando
-            fracao={carga < 1 ? carga : d.pecas.filter((pc) => pecas[pc.chave]).length / d.pecas.length}
+            fracao={carga < 1 ? carga : feitas / d.pecas.length}
             titulo={carga < 1 ? tr('Preparando o motor de desenho', 'Preparing the drawing engine') : tr('Desenhando as peças', 'Drawing the parts')}
             detalhe={
               carga < 1
                 ? `${Math.round(carga * 100)}% · ${tr('só na primeira vez, depois fica guardado no navegador', 'first time only, then it stays cached in the browser')}`
-                : tr(`${d.pecas.filter((pc) => pecas[pc.chave]).length} de ${d.pecas.length} peças`, `${d.pecas.filter((pc) => pecas[pc.chave]).length} of ${d.pecas.length} parts`)
+                : tr(`${feitas} de ${d.pecas.length} peças`, `${feitas} of ${d.pecas.length} parts`)
             }
           />
         )}
@@ -299,25 +307,75 @@ function PranchaProjeto({ p, setP }: { p: Projeto; setP: (f: (x: Projeto) => Pro
           <div style={{ padding: '16px 16px 0' }} role="alert">
             {ruins.length > 0 && (
               <p className="alerta" data-nivel="erro">
-                {tr('Há campo com valor inválido nos parâmetros. Mostrando o último projeto válido.', 'A parameter has an invalid value. Showing the last valid design.')}
+                <OctagonAlert className="ico" aria-hidden="true" />
+                <span>{tr('Há campo com valor inválido nos parâmetros. Mostrando o último projeto válido.', 'A parameter has an invalid value. Showing the last valid design.')}</span>
               </p>
             )}
             {erros.map((a) => (
-              <p key={a.texto} className="alerta" data-nivel="erro">{a.texto}</p>
+              <p key={a.texto} className="alerta" data-nivel="erro">
+                <OctagonAlert className="ico" aria-hidden="true" />
+                <span>{a.texto}</span>
+              </p>
             ))}
-            {erroCad && <p className="alerta" data-nivel="erro">{erroCad}</p>}
+            {erroCad && (
+              <p className="alerta" data-nivel="erro">
+                <OctagonAlert className="ico" aria-hidden="true" />
+                <span>{erroCad}</span>
+              </p>
+            )}
           </div>
         )}
         <div className="abas" role="tablist" aria-label={tr('Seções do projeto', 'Project sections')} onKeyDown={teclaAbas}>
           {ABAS.map(([k, r]) => (
             <button key={k} id={`aba-${k}`} role="tab" aria-selected={aba === k} aria-controls={`painel-${k}`} tabIndex={aba === k ? 0 : -1} onClick={() => setAba(k)}>
               {r}
-              {k === 'alertas' && d ? ` (${d.alertas.filter((a) => a.nivel !== 'info').length})` : ''}
+              {k === 'alertas' && nAlertas > 0 && <span className="conta">{nAlertas}</span>}
             </button>
           ))}
         </div>
         {d && (
           <>
+            <div className="aba" role="tabpanel" id="painel-pecas" aria-labelledby="aba-pecas" hidden={aba !== 'pecas'}>
+              <h2>{tr('Peças para imprimir', 'Parts to print')}</h2>
+              <p className="mudo">
+                {tr('PETG, 4 paredes, 40% de preenchimento. Imprima uma peça e teste o encaixe no tubo antes das outras.', 'PETG, 4 walls, 40% infill. Print one part and test the fit on the tube before the others.')}
+              </p>
+              <p>
+                <button className="btn btn-pequeno nao-imprimir" disabled={!prontas || erros.length > 0} onClick={baixarConjunto}>
+                  <Download className="ico" aria-hidden="true" />
+                  {tr('Conjunto montado (.step)', 'Full assembly (.step)')}
+                </button>
+              </p>
+              <div className="pecas">
+                {d.pecas.map((pc) => {
+                  const r = pecas[pc.chave]
+                  return (
+                    <div
+                      key={pc.chave}
+                      className="peca"
+                      onPointerEnter={() => setDestaque(pc.chave)}
+                      onPointerLeave={() => setDestaque(null)}
+                      onFocus={() => setDestaque(pc.chave)}
+                      onBlur={() => setDestaque(null)}
+                    >
+                      <div className="mini">
+                        {r ? <MiniPeca mesh={r.mesh} rotulo={`${tr('Prévia', 'Preview')}: ${pc.nome}`} ativo={destaque === pc.chave} /> : <span className="mudo" style={{ display: 'block', padding: 8 }}>{tr('desenhando…', 'drawing…')}</span>}
+                      </div>
+                      <div>
+                        <div className="qtd">×{pc.qtd}</div>
+                        <h3>{pc.nome}</h3>
+                        <p className="mudo" style={{ fontSize: '0.9rem' }}>{DICA_IMPRESSAO[pc.spec.tipo]}</p>
+                        <div className="acoes">
+                          <button className="btn btn-pequeno nao-imprimir" disabled={!r} onClick={() => r && baixar(nomeStl(pc), r.stl)}>STL</button>
+                          <button className="btn btn-pequeno nao-imprimir" disabled={!r} onClick={async () => baixar(nomeStl(pc).replace(/\.stl$/, '.step'), await cad.step(pc.spec))}>STEP</button>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
             <div className="aba" role="tabpanel" id="painel-bom" aria-labelledby="aba-bom" hidden={aba !== 'bom'}>
               <h2>{tr('Lista de materiais', 'Bill of materials')}</h2>
               <table>
@@ -341,13 +399,16 @@ function PranchaProjeto({ p, setP }: { p: Projeto; setP: (f: (x: Projeto) => Pro
                 </tbody>
               </table>
               <p style={{ marginTop: 12 }}>
-                <button className="btn btn-pequeno nao-imprimir" onClick={() => baixar(`${tr('materiais', 'materials')}_${nomeArq}.csv`, csv(bom(p, d) as never), 'text/csv;charset=utf-8')}>Baixar CSV</button>
+                <button className="btn btn-pequeno nao-imprimir" onClick={() => baixar(`${tr('materiais', 'materials')}_${nomeArq}.csv`, csv(bom(p, d) as never), 'text/csv;charset=utf-8')}>
+                  <Download className="ico" aria-hidden="true" />
+                  {tr('Baixar CSV', 'Download CSV')}
+                </button>
               </p>
             </div>
 
             <div className="aba" role="tabpanel" id="painel-cortes" aria-labelledby="aba-cortes" hidden={aba !== 'cortes'}>
               <h2>{tr('Cortes de tubo', 'Tube cuts')}</h2>
-              <p className="mudo">Medidas de ponta a ponta do tubo, já descontado o que entra nas conexões. Tubo Ø {p.materiais.tuboD} mm.</p>
+              <p className="mudo">{tr(`Medidas de ponta a ponta do tubo, já descontado o que entra nas conexões. Tubo Ø ${p.materiais.tuboD} mm.`, `Tube end-to-end lengths, with the part that goes into the connectors already taken off. Tube Ø ${p.materiais.tuboD} mm.`)}</p>
               <table>
                 <thead>
                   <tr>
@@ -367,41 +428,11 @@ function PranchaProjeto({ p, setP }: { p: Projeto; setP: (f: (x: Projeto) => Pro
                 </tbody>
               </table>
               <p style={{ marginTop: 12 }}>
-                <button className="btn btn-pequeno nao-imprimir" onClick={() => baixar(`${tr('cortes', 'cuts')}_${nomeArq}.csv`, csv(linhasCortes(d)), 'text/csv;charset=utf-8')}>Baixar CSV</button>
-              </p>
-            </div>
-
-            <div className="aba" role="tabpanel" id="painel-pecas" aria-labelledby="aba-pecas" hidden={aba !== 'pecas'}>
-              <h2>{tr('Peças para imprimir', 'Parts to print')}</h2>
-              <p className="mudo">
-                {tr('PETG, 4 paredes, 40% de preenchimento. Imprima uma peça e teste o encaixe no tubo antes das outras.', 'PETG, 4 walls, 40% infill. Print one part and test the fit on the tube before the others.')}
-              </p>
-              <p>
-                <button className="btn btn-pequeno nao-imprimir" disabled={!prontas || erros.length > 0} onClick={baixarConjunto}>
-                  {tr('Baixar conjunto montado (.step)', 'Download full assembly (.step)')}
+                <button className="btn btn-pequeno nao-imprimir" onClick={() => baixar(`${tr('cortes', 'cuts')}_${nomeArq}.csv`, csv(linhasCortes(d)), 'text/csv;charset=utf-8')}>
+                  <Download className="ico" aria-hidden="true" />
+                  {tr('Baixar CSV', 'Download CSV')}
                 </button>
               </p>
-              <div className="pecas">
-                {d.pecas.map((pc) => {
-                  const r = pecas[pc.chave]
-                  return (
-                    <div key={pc.chave} className="peca">
-                      <div className="mini">{r ? <MiniPeca mesh={r.mesh} rotulo={`${tr('Prévia', 'Preview')}: ${pc.nome}`} /> : <span className="mudo" style={{ display: 'block', padding: 8 }}>
-                          {tr('gerando…', 'generating…')}
-                        </span>}</div>
-                      <div>
-                        <h3>{pc.nome}</h3>
-                        <div className="qtd">×{pc.qtd}</div>
-                        <p className="mudo" style={{ fontSize: '0.9rem' }}>{DICA_IMPRESSAO[pc.spec.tipo]}</p>
-                        <div className="acoes">
-                          <button className="btn btn-pequeno nao-imprimir" disabled={!r} onClick={() => r && baixar(nomeStl(pc), r.stl)}>STL</button>
-                          <button className="btn btn-pequeno nao-imprimir" disabled={!r} onClick={async () => baixar(nomeStl(pc).replace(/\.stl$/, '.step'), await cad.step(pc.spec))}>STEP</button>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
             </div>
 
             <div className="aba" role="tabpanel" id="painel-montagem" aria-labelledby="aba-montagem" hidden={aba !== 'montagem'}>
@@ -415,12 +446,18 @@ function PranchaProjeto({ p, setP }: { p: Projeto; setP: (f: (x: Projeto) => Pro
 
             <div className="aba" role="tabpanel" id="painel-alertas" aria-labelledby="aba-alertas" hidden={aba !== 'alertas'}>
               <h2>{tr('Alertas de segurança', 'Safety alerts')}</h2>
-              {d.alertas.map((a) => (
-                <p key={a.texto} className="alerta" data-nivel={a.nivel}>
-                  <strong>{NIVEL[a.nivel]}</strong>
-                  <span>{a.texto}</span>
-                </p>
-              ))}
+              {d.alertas.map((a) => {
+                const Ico = ICONE_NIVEL[a.nivel]
+                return (
+                  <p key={a.texto} className="alerta" data-nivel={a.nivel}>
+                    <Ico className="ico" aria-hidden="true" />
+                    <span>
+                      <strong>{NIVEL[a.nivel]}</strong>
+                      {a.texto}
+                    </span>
+                  </p>
+                )
+              })}
             </div>
           </>
         )}

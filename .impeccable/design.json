@@ -1,0 +1,868 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-20T21:49:22.544Z",
+  "title": "Design System: Rodante",
+  "extensions": {
+    "colorMeta": {
+      "azul": {
+        "role": "primary",
+        "displayName": "Azul de Montagem",
+        "canonical": "#1f4fd1",
+        "oklch": "oklch(48.4% 0.207 264.3)",
+        "cssVar": "--azul",
+        "mode": "light",
+        "darkCounterpart": "azul-escuro-modo",
+        "tonalRamp": [
+          "oklch(15% 0.200 264.3)",
+          "oklch(26% 0.200 264.3)",
+          "oklch(38% 0.200 264.3)",
+          "oklch(50% 0.200 264.3)",
+          "oklch(62% 0.200 264.3)",
+          "oklch(74% 0.200 264.3)",
+          "oklch(85% 0.200 264.3)",
+          "oklch(95% 0.080 264.3)"
+        ]
+      },
+      "azul-tinta": {
+        "role": "primary",
+        "displayName": "Branco de Contraste",
+        "canonical": "#ffffff",
+        "oklch": "oklch(100.0% 0.000 0.0)",
+        "cssVar": "--azul-tinta",
+        "mode": "light",
+        "darkCounterpart": "azul-tinta-escuro-modo",
+        "tonalRamp": [
+          "oklch(15% 0.000 0.0)",
+          "oklch(26% 0.000 0.0)",
+          "oklch(38% 0.000 0.0)",
+          "oklch(50% 0.000 0.0)",
+          "oklch(62% 0.000 0.0)",
+          "oklch(74% 0.000 0.0)",
+          "oklch(85% 0.000 0.0)",
+          "oklch(95% 0.000 0.0)"
+        ]
+      },
+      "azul-claro": {
+        "role": "primary",
+        "displayName": "Azul Lavado",
+        "canonical": "#e2e9fb",
+        "oklch": "oklch(93.4% 0.026 268.8)",
+        "cssVar": "--azul-claro",
+        "mode": "light",
+        "darkCounterpart": "azul-claro-escuro-modo",
+        "tonalRamp": [
+          "oklch(15% 0.026 268.8)",
+          "oklch(26% 0.026 268.8)",
+          "oklch(38% 0.026 268.8)",
+          "oklch(50% 0.026 268.8)",
+          "oklch(62% 0.026 268.8)",
+          "oklch(74% 0.026 268.8)",
+          "oklch(85% 0.026 268.8)",
+          "oklch(95% 0.010 268.8)"
+        ]
+      },
+      "papel": {
+        "role": "neutral",
+        "displayName": "Papel Quente",
+        "canonical": "#fbfaf7",
+        "oklch": "oklch(98.5% 0.004 91.4)",
+        "cssVar": "--papel",
+        "mode": "light",
+        "darkCounterpart": "papel-escuro-modo",
+        "tonalRamp": [
+          "oklch(15% 0.004 91.4)",
+          "oklch(26% 0.004 91.4)",
+          "oklch(38% 0.004 91.4)",
+          "oklch(50% 0.004 91.4)",
+          "oklch(62% 0.004 91.4)",
+          "oklch(74% 0.004 91.4)",
+          "oklch(85% 0.004 91.4)",
+          "oklch(95% 0.002 91.4)"
+        ]
+      },
+      "papel-2": {
+        "role": "neutral",
+        "displayName": "Papel Sombreado",
+        "canonical": "#f1efe9",
+        "oklch": "oklch(95.2% 0.008 91.5)",
+        "cssVar": "--papel-2",
+        "mode": "light",
+        "darkCounterpart": "papel-2-escuro-modo",
+        "tonalRamp": [
+          "oklch(15% 0.008 91.5)",
+          "oklch(26% 0.008 91.5)",
+          "oklch(38% 0.008 91.5)",
+          "oklch(50% 0.008 91.5)",
+          "oklch(62% 0.008 91.5)",
+          "oklch(74% 0.008 91.5)",
+          "oklch(85% 0.008 91.5)",
+          "oklch(95% 0.003 91.5)"
+        ]
+      },
+      "tinta": {
+        "role": "neutral",
+        "displayName": "Tinta",
+        "canonical": "#141414",
+        "oklch": "oklch(19.1% 0.000 0.0)",
+        "cssVar": "--tinta",
+        "mode": "light",
+        "darkCounterpart": "tinta-escuro-modo",
+        "tonalRamp": [
+          "oklch(15% 0.000 0.0)",
+          "oklch(26% 0.000 0.0)",
+          "oklch(38% 0.000 0.0)",
+          "oklch(50% 0.000 0.0)",
+          "oklch(62% 0.000 0.0)",
+          "oklch(74% 0.000 0.0)",
+          "oklch(85% 0.000 0.0)",
+          "oklch(95% 0.000 0.0)"
+        ]
+      },
+      "tinta-2": {
+        "role": "neutral",
+        "displayName": "Tinta Diluída",
+        "canonical": "#57534b",
+        "oklch": "oklch(44.3% 0.014 84.6)",
+        "cssVar": "--tinta-2",
+        "mode": "light",
+        "darkCounterpart": "tinta-2-escuro-modo",
+        "tonalRamp": [
+          "oklch(15% 0.014 84.6)",
+          "oklch(26% 0.014 84.6)",
+          "oklch(38% 0.014 84.6)",
+          "oklch(50% 0.014 84.6)",
+          "oklch(62% 0.014 84.6)",
+          "oklch(74% 0.014 84.6)",
+          "oklch(85% 0.014 84.6)",
+          "oklch(95% 0.006 84.6)"
+        ]
+      },
+      "cinza-1": {
+        "role": "neutral",
+        "displayName": "Cinza 1",
+        "canonical": "#e4e1d9",
+        "oklch": "oklch(91.0% 0.011 89.7)",
+        "cssVar": "--cinza-1",
+        "mode": "light",
+        "darkCounterpart": "cinza-1-escuro-modo",
+        "tonalRamp": [
+          "oklch(15% 0.011 89.7)",
+          "oklch(26% 0.011 89.7)",
+          "oklch(38% 0.011 89.7)",
+          "oklch(50% 0.011 89.7)",
+          "oklch(62% 0.011 89.7)",
+          "oklch(74% 0.011 89.7)",
+          "oklch(85% 0.011 89.7)",
+          "oklch(95% 0.004 89.7)"
+        ]
+      },
+      "cinza-2": {
+        "role": "neutral",
+        "displayName": "Cinza 2",
+        "canonical": "#c8c4ba",
+        "oklch": "oklch(82.1% 0.014 88.7)",
+        "cssVar": "--cinza-2",
+        "mode": "light",
+        "darkCounterpart": "cinza-2-escuro-modo",
+        "tonalRamp": [
+          "oklch(15% 0.014 88.7)",
+          "oklch(26% 0.014 88.7)",
+          "oklch(38% 0.014 88.7)",
+          "oklch(50% 0.014 88.7)",
+          "oklch(62% 0.014 88.7)",
+          "oklch(74% 0.014 88.7)",
+          "oklch(85% 0.014 88.7)",
+          "oklch(95% 0.006 88.7)"
+        ]
+      },
+      "cinza-3": {
+        "role": "neutral",
+        "displayName": "Cinza 3",
+        "canonical": "#8e897e",
+        "oklch": "oklch(63.1% 0.017 86.5)",
+        "cssVar": "--cinza-3",
+        "mode": "light",
+        "darkCounterpart": "cinza-3-escuro-modo",
+        "tonalRamp": [
+          "oklch(15% 0.017 86.5)",
+          "oklch(26% 0.017 86.5)",
+          "oklch(38% 0.017 86.5)",
+          "oklch(50% 0.017 86.5)",
+          "oklch(62% 0.017 86.5)",
+          "oklch(74% 0.017 86.5)",
+          "oklch(85% 0.017 86.5)",
+          "oklch(95% 0.007 86.5)"
+        ]
+      },
+      "erro": {
+        "role": "status",
+        "displayName": "Vermelho de Erro",
+        "canonical": "#c4291c",
+        "oklch": "oklch(53.5% 0.193 29.7)",
+        "cssVar": "--erro",
+        "mode": "light",
+        "darkCounterpart": "erro-escuro-modo",
+        "tonalRamp": [
+          "oklch(15% 0.193 29.7)",
+          "oklch(26% 0.193 29.7)",
+          "oklch(38% 0.193 29.7)",
+          "oklch(50% 0.193 29.7)",
+          "oklch(62% 0.193 29.7)",
+          "oklch(74% 0.193 29.7)",
+          "oklch(85% 0.193 29.7)",
+          "oklch(95% 0.077 29.7)"
+        ]
+      },
+      "erro-claro": {
+        "role": "status",
+        "displayName": "Rosa de Erro",
+        "canonical": "#fbe7e4",
+        "oklch": "oklch(94.3% 0.022 27.8)",
+        "cssVar": "--erro-claro",
+        "mode": "light",
+        "darkCounterpart": "erro-claro-escuro-modo",
+        "tonalRamp": [
+          "oklch(15% 0.022 27.8)",
+          "oklch(26% 0.022 27.8)",
+          "oklch(38% 0.022 27.8)",
+          "oklch(50% 0.022 27.8)",
+          "oklch(62% 0.022 27.8)",
+          "oklch(74% 0.022 27.8)",
+          "oklch(85% 0.022 27.8)",
+          "oklch(95% 0.009 27.8)"
+        ]
+      },
+      "aviso": {
+        "role": "status",
+        "displayName": "Ocre de Aviso",
+        "canonical": "#8a5a00",
+        "oklch": "oklch(50.8% 0.108 73.3)",
+        "cssVar": "--aviso",
+        "mode": "light",
+        "darkCounterpart": "aviso-escuro-modo",
+        "tonalRamp": [
+          "oklch(15% 0.108 73.3)",
+          "oklch(26% 0.108 73.3)",
+          "oklch(38% 0.108 73.3)",
+          "oklch(50% 0.108 73.3)",
+          "oklch(62% 0.108 73.3)",
+          "oklch(74% 0.108 73.3)",
+          "oklch(85% 0.108 73.3)",
+          "oklch(95% 0.043 73.3)"
+        ]
+      },
+      "aviso-claro": {
+        "role": "status",
+        "displayName": "Creme de Aviso",
+        "canonical": "#fbf0d6",
+        "oklch": "oklch(95.7% 0.036 87.8)",
+        "cssVar": "--aviso-claro",
+        "mode": "light",
+        "darkCounterpart": "aviso-claro-escuro-modo",
+        "tonalRamp": [
+          "oklch(15% 0.036 87.8)",
+          "oklch(26% 0.036 87.8)",
+          "oklch(38% 0.036 87.8)",
+          "oklch(50% 0.036 87.8)",
+          "oklch(62% 0.036 87.8)",
+          "oklch(74% 0.036 87.8)",
+          "oklch(85% 0.036 87.8)",
+          "oklch(95% 0.014 87.8)"
+        ]
+      },
+      "azul-escuro-modo": {
+        "role": "primary",
+        "displayName": "Azul de Montagem (tema escuro)",
+        "canonical": "#86a6ff",
+        "oklch": "oklch(73.8% 0.134 268.0)",
+        "cssVar": "--azul",
+        "mode": "dark",
+        "lightCounterpart": "azul",
+        "tonalRamp": [
+          "oklch(15% 0.134 268.0)",
+          "oklch(26% 0.134 268.0)",
+          "oklch(38% 0.134 268.0)",
+          "oklch(50% 0.134 268.0)",
+          "oklch(62% 0.134 268.0)",
+          "oklch(74% 0.134 268.0)",
+          "oklch(85% 0.134 268.0)",
+          "oklch(95% 0.054 268.0)"
+        ]
+      },
+      "azul-tinta-escuro-modo": {
+        "role": "primary",
+        "displayName": "Branco de Contraste (tema escuro)",
+        "canonical": "#0b1430",
+        "oklch": "oklch(20.1% 0.057 267.6)",
+        "cssVar": "--azul-tinta",
+        "mode": "dark",
+        "lightCounterpart": "azul-tinta",
+        "tonalRamp": [
+          "oklch(15% 0.057 267.6)",
+          "oklch(26% 0.057 267.6)",
+          "oklch(38% 0.057 267.6)",
+          "oklch(50% 0.057 267.6)",
+          "oklch(62% 0.057 267.6)",
+          "oklch(74% 0.057 267.6)",
+          "oklch(85% 0.057 267.6)",
+          "oklch(95% 0.023 267.6)"
+        ]
+      },
+      "azul-claro-escuro-modo": {
+        "role": "primary",
+        "displayName": "Azul Lavado (tema escuro)",
+        "canonical": "#1a2446",
+        "oklch": "oklch(27.1% 0.065 269.4)",
+        "cssVar": "--azul-claro",
+        "mode": "dark",
+        "lightCounterpart": "azul-claro",
+        "tonalRamp": [
+          "oklch(15% 0.065 269.4)",
+          "oklch(26% 0.065 269.4)",
+          "oklch(38% 0.065 269.4)",
+          "oklch(50% 0.065 269.4)",
+          "oklch(62% 0.065 269.4)",
+          "oklch(74% 0.065 269.4)",
+          "oklch(85% 0.065 269.4)",
+          "oklch(95% 0.026 269.4)"
+        ]
+      },
+      "papel-escuro-modo": {
+        "role": "neutral",
+        "displayName": "Papel Quente (tema escuro)",
+        "canonical": "#121211",
+        "oklch": "oklch(18.2% 0.002 106.6)",
+        "cssVar": "--papel",
+        "mode": "dark",
+        "lightCounterpart": "papel",
+        "tonalRamp": [
+          "oklch(15% 0.002 106.6)",
+          "oklch(26% 0.002 106.6)",
+          "oklch(38% 0.002 106.6)",
+          "oklch(50% 0.002 106.6)",
+          "oklch(62% 0.002 106.6)",
+          "oklch(74% 0.002 106.6)",
+          "oklch(85% 0.002 106.6)",
+          "oklch(95% 0.001 106.6)"
+        ]
+      },
+      "papel-2-escuro-modo": {
+        "role": "neutral",
+        "displayName": "Papel Sombreado (tema escuro)",
+        "canonical": "#1b1b19",
+        "oklch": "oklch(22.1% 0.004 106.7)",
+        "cssVar": "--papel-2",
+        "mode": "dark",
+        "lightCounterpart": "papel-2",
+        "tonalRamp": [
+          "oklch(15% 0.004 106.7)",
+          "oklch(26% 0.004 106.7)",
+          "oklch(38% 0.004 106.7)",
+          "oklch(50% 0.004 106.7)",
+          "oklch(62% 0.004 106.7)",
+          "oklch(74% 0.004 106.7)",
+          "oklch(85% 0.004 106.7)",
+          "oklch(95% 0.002 106.7)"
+        ]
+      },
+      "tinta-escuro-modo": {
+        "role": "neutral",
+        "displayName": "Tinta (tema escuro)",
+        "canonical": "#f1efe9",
+        "oklch": "oklch(95.2% 0.008 91.5)",
+        "cssVar": "--tinta",
+        "mode": "dark",
+        "lightCounterpart": "tinta",
+        "tonalRamp": [
+          "oklch(15% 0.008 91.5)",
+          "oklch(26% 0.008 91.5)",
+          "oklch(38% 0.008 91.5)",
+          "oklch(50% 0.008 91.5)",
+          "oklch(62% 0.008 91.5)",
+          "oklch(74% 0.008 91.5)",
+          "oklch(85% 0.008 91.5)",
+          "oklch(95% 0.003 91.5)"
+        ]
+      },
+      "tinta-2-escuro-modo": {
+        "role": "neutral",
+        "displayName": "Tinta Diluída (tema escuro)",
+        "canonical": "#b4afa4",
+        "oklch": "oklch(75.5% 0.016 86.4)",
+        "cssVar": "--tinta-2",
+        "mode": "dark",
+        "lightCounterpart": "tinta-2",
+        "tonalRamp": [
+          "oklch(15% 0.016 86.4)",
+          "oklch(26% 0.016 86.4)",
+          "oklch(38% 0.016 86.4)",
+          "oklch(50% 0.016 86.4)",
+          "oklch(62% 0.016 86.4)",
+          "oklch(74% 0.016 86.4)",
+          "oklch(85% 0.016 86.4)",
+          "oklch(95% 0.007 86.4)"
+        ]
+      },
+      "cinza-1-escuro-modo": {
+        "role": "neutral",
+        "displayName": "Cinza 1 (tema escuro)",
+        "canonical": "#2a2926",
+        "oklch": "oklch(28.1% 0.006 91.6)",
+        "cssVar": "--cinza-1",
+        "mode": "dark",
+        "lightCounterpart": "cinza-1",
+        "tonalRamp": [
+          "oklch(15% 0.006 91.6)",
+          "oklch(26% 0.006 91.6)",
+          "oklch(38% 0.006 91.6)",
+          "oklch(50% 0.006 91.6)",
+          "oklch(62% 0.006 91.6)",
+          "oklch(74% 0.006 91.6)",
+          "oklch(85% 0.006 91.6)",
+          "oklch(95% 0.002 91.6)"
+        ]
+      },
+      "cinza-2-escuro-modo": {
+        "role": "neutral",
+        "displayName": "Cinza 2 (tema escuro)",
+        "canonical": "#3d3b37",
+        "oklch": "oklch(35.3% 0.007 84.6)",
+        "cssVar": "--cinza-2",
+        "mode": "dark",
+        "lightCounterpart": "cinza-2",
+        "tonalRamp": [
+          "oklch(15% 0.007 84.6)",
+          "oklch(26% 0.007 84.6)",
+          "oklch(38% 0.007 84.6)",
+          "oklch(50% 0.007 84.6)",
+          "oklch(62% 0.007 84.6)",
+          "oklch(74% 0.007 84.6)",
+          "oklch(85% 0.007 84.6)",
+          "oklch(95% 0.003 84.6)"
+        ]
+      },
+      "cinza-3-escuro-modo": {
+        "role": "neutral",
+        "displayName": "Cinza 3 (tema escuro)",
+        "canonical": "#6f6b63",
+        "oklch": "oklch(52.9% 0.013 84.6)",
+        "cssVar": "--cinza-3",
+        "mode": "dark",
+        "lightCounterpart": "cinza-3",
+        "tonalRamp": [
+          "oklch(15% 0.013 84.6)",
+          "oklch(26% 0.013 84.6)",
+          "oklch(38% 0.013 84.6)",
+          "oklch(50% 0.013 84.6)",
+          "oklch(62% 0.013 84.6)",
+          "oklch(74% 0.013 84.6)",
+          "oklch(85% 0.013 84.6)",
+          "oklch(95% 0.005 84.6)"
+        ]
+      },
+      "erro-escuro-modo": {
+        "role": "status",
+        "displayName": "Vermelho de Erro (tema escuro)",
+        "canonical": "#ff8a7d",
+        "oklch": "oklch(75.9% 0.144 27.6)",
+        "cssVar": "--erro",
+        "mode": "dark",
+        "lightCounterpart": "erro",
+        "tonalRamp": [
+          "oklch(15% 0.144 27.6)",
+          "oklch(26% 0.144 27.6)",
+          "oklch(38% 0.144 27.6)",
+          "oklch(50% 0.144 27.6)",
+          "oklch(62% 0.144 27.6)",
+          "oklch(74% 0.144 27.6)",
+          "oklch(85% 0.144 27.6)",
+          "oklch(95% 0.058 27.6)"
+        ]
+      },
+      "erro-claro-escuro-modo": {
+        "role": "status",
+        "displayName": "Rosa de Erro (tema escuro)",
+        "canonical": "#3a1a16",
+        "oklch": "oklch(26.3% 0.052 28.5)",
+        "cssVar": "--erro-claro",
+        "mode": "dark",
+        "lightCounterpart": "erro-claro",
+        "tonalRamp": [
+          "oklch(15% 0.052 28.5)",
+          "oklch(26% 0.052 28.5)",
+          "oklch(38% 0.052 28.5)",
+          "oklch(50% 0.052 28.5)",
+          "oklch(62% 0.052 28.5)",
+          "oklch(74% 0.052 28.5)",
+          "oklch(85% 0.052 28.5)",
+          "oklch(95% 0.021 28.5)"
+        ]
+      },
+      "aviso-escuro-modo": {
+        "role": "status",
+        "displayName": "Ocre de Aviso (tema escuro)",
+        "canonical": "#f0c062",
+        "oklch": "oklch(83.2% 0.125 82.4)",
+        "cssVar": "--aviso",
+        "mode": "dark",
+        "lightCounterpart": "aviso",
+        "tonalRamp": [
+          "oklch(15% 0.125 82.4)",
+          "oklch(26% 0.125 82.4)",
+          "oklch(38% 0.125 82.4)",
+          "oklch(50% 0.125 82.4)",
+          "oklch(62% 0.125 82.4)",
+          "oklch(74% 0.125 82.4)",
+          "oklch(85% 0.125 82.4)",
+          "oklch(95% 0.050 82.4)"
+        ]
+      },
+      "aviso-claro-escuro-modo": {
+        "role": "status",
+        "displayName": "Creme de Aviso (tema escuro)",
+        "canonical": "#33280f",
+        "oklch": "oklch(28.3% 0.042 85.7)",
+        "cssVar": "--aviso-claro",
+        "mode": "dark",
+        "lightCounterpart": "aviso-claro",
+        "tonalRamp": [
+          "oklch(15% 0.042 85.7)",
+          "oklch(26% 0.042 85.7)",
+          "oklch(38% 0.042 85.7)",
+          "oklch(50% 0.042 85.7)",
+          "oklch(62% 0.042 85.7)",
+          "oklch(74% 0.042 85.7)",
+          "oklch(85% 0.042 85.7)",
+          "oklch(95% 0.017 85.7)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "h1 de página; na capa até 4,9rem e 15ch."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "h2 de seção; a largura 112 também vale para legendas de painel e títulos de regra."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "h3 de cartão, opção e peça."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Texto corrido, 40–56ch."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Rótulos de campo e legendas de grupo."
+      },
+      "botao": {
+        "displayName": "Botão",
+        "purpose": "Botões, abas e alternador."
+      },
+      "dado": {
+        "displayName": "Dado",
+        "purpose": "Valor digitado nas entradas, algarismos tabulares."
+      },
+      "numeral": {
+        "displayName": "Numeral",
+        "purpose": "Número do passo, contagem ×N e letra de tipo: peso 900, largura 62."
+      },
+      "marca": {
+        "displayName": "Marca",
+        "purpose": "Nome Rodante no cabeçalho."
+      }
+    },
+    "shadows": [
+      {
+        "name": "selecao",
+        "value": "inset 0 0 0 2px var(--azul)",
+        "purpose": "Opção e tipo marcados, junto da borda azul."
+      },
+      {
+        "name": "sublinhado-nav",
+        "value": "inset 0 -3px 0 var(--azul)",
+        "purpose": "Link da página atual no cabeçalho."
+      },
+      {
+        "name": "sublinhado-aba",
+        "value": "inset 0 -4px 0 var(--azul)",
+        "purpose": "Aba selecionada na prancha."
+      },
+      {
+        "name": "halo-foco",
+        "value": "0 0 0 3px var(--azul-claro)",
+        "purpose": "Entrada com foco."
+      },
+      {
+        "name": "halo-erro",
+        "value": "0 0 0 3px var(--erro-claro)",
+        "purpose": "Entrada com erro."
+      }
+    ],
+    "strokes": [
+      {
+        "name": "traco",
+        "value": "1.5px",
+        "purpose": "Borda padrão de toda caixa e linha de seção."
+      },
+      {
+        "name": "traco-forte",
+        "value": "3px",
+        "purpose": "Carimbo veterinário e pares certo/errado."
+      },
+      {
+        "name": "contorno-3d-peca",
+        "value": "2px (pixels de tela)",
+        "purpose": "Outlines screenspace das peças 3D."
+      },
+      {
+        "name": "contorno-3d-miniatura",
+        "value": "1.6px (pixels de tela)",
+        "purpose": "Miniaturas de peça girando."
+      },
+      {
+        "name": "contorno-3d-cao",
+        "value": "2.5px (pixels de tela)",
+        "purpose": "Casca de faces de trás do cão com esqueleto."
+      }
+    ],
+    "material3d": {
+      "camera": "ortográfica; vista inicial isométrica (direção -0.9, -1.1, 0.75); enquadramento automático pela caixa",
+      "toon": "meshToonMaterial com rampa de 3 degraus [120, 200, 255], NearestFilter",
+      "luz": "hemisphereLight + directionalLight",
+      "coresDe": "variáveis CSS lidas por getComputedStyle (--papel, --tinta, --azul, --cinza-1, --cinza-2, --cinza-3)",
+      "tubo": "cinza-1",
+      "roda": "cinza-3, cubo papel, 3 raios tinta",
+      "conexao": "papel; a destacada em azul",
+      "cao": "MeshBasicMaterial papel chapado; olhos e pretos em tinta; sem sombreamento",
+      "cota": "linha azul tracejada 1.5px (traço 8, vão 5)"
+    },
+    "motion": [
+      {
+        "name": "sai",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Curva única de todo movimento."
+      },
+      {
+        "name": "cor",
+        "value": "0.15s",
+        "purpose": "Troca de fundo e cor em hover."
+      },
+      {
+        "name": "gesto",
+        "value": "0.25s",
+        "purpose": "Transform e anel de seleção; botão desce 1px e reduz para 0.98 ao clicar."
+      },
+      {
+        "name": "seta",
+        "value": "0.35s",
+        "purpose": "Ícone final do botão primário desliza 4px."
+      },
+      {
+        "name": "passo",
+        "value": "0.4s",
+        "purpose": "Opacidade do passo ativo (0.32 para 1)."
+      },
+      {
+        "name": "etapa",
+        "value": "0.5s",
+        "purpose": "Barra azul das etapas preenche em scaleX."
+      },
+      {
+        "name": "entrada-rolagem",
+        "value": "animation-timeline: view(); entry 0% a 70%",
+        "purpose": "Blocos sobem 28px a partir de 0.15 de opacidade; o conteúdo começa visível."
+      },
+      {
+        "name": "fita",
+        "value": "MathUtils.damp, lambda 5",
+        "purpose": "Fita métrica 3D desenrola até a medida."
+      },
+      {
+        "name": "roda-carregando",
+        "value": "1s linear infinite",
+        "purpose": "Roda gira sobre a fita de progresso."
+      },
+      {
+        "name": "reduzido",
+        "value": "prefers-reduced-motion: reduce",
+        "purpose": "Desliga toda animação e transição; o 3D mostra o estado final."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "prancha-empilha",
+        "value": "1100px"
+      },
+      {
+        "name": "uma-coluna",
+        "value": "900px"
+      },
+      {
+        "name": "compacto",
+        "value": "560px"
+      }
+    ],
+    "icons": {
+      "library": "lucide-react",
+      "strokeWidth": 1.75,
+      "size": "1.2em"
+    },
+    "font": {
+      "family": "Archivo Variable",
+      "source": "@fontsource-variable/archivo/wdth.css (auto-hospedada)",
+      "axes": {
+        "wdth": "62–125",
+        "wght": "100–900"
+      }
+    }
+  },
+  "components": [
+    {
+      "name": "Botão Primário",
+      "kind": "button",
+      "refersTo": "botao-primario",
+      "description": "Ação principal (Começar, Baixar tudo); um por grupo de ações.",
+      "html": "<button class=\"ds-btn ds-btn-primario\">Começar com esta <svg class=\"ds-ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button>",
+      "css": ".ds-btn { font-family: var(--fonte, 'Archivo Variable', 'Archivo', system-ui, sans-serif); font-weight: 700; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 10px 20px; border-radius: var(--raio, 3px); cursor: pointer; border: 1.5px solid var(--tinta, #141414); background: var(--papel, #fbfaf7); color: var(--tinta, #141414); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s, color 0.15s; } .ds-btn:hover { background: var(--tinta, #141414); color: var(--papel, #fbfaf7); } .ds-btn:active { transform: translateY(1px) scale(0.98); } .ds-btn:focus-visible { outline: 3px solid var(--azul, #1f4fd1); outline-offset: 3px; } .ds-ico { width: 1.2em; height: 1.2em; transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-primario { background: var(--azul, #1f4fd1); border-color: var(--azul, #1f4fd1); color: var(--azul-tinta, #ffffff); } .ds-btn-primario:hover { background: var(--tinta, #141414); border-color: var(--tinta, #141414); color: var(--papel, #fbfaf7); } .ds-btn-primario:hover .ds-ico { transform: translateX(4px); }"
+    },
+    {
+      "name": "Botão Secundário",
+      "kind": "button",
+      "refersTo": "botao",
+      "description": "Caixa de traço que vira tinta sólida no hover.",
+      "html": "<button class=\"ds-btn-sec\">Meus projetos</button>",
+      "css": ".ds-btn-sec { font-family: var(--fonte, 'Archivo Variable', 'Archivo', system-ui, sans-serif); font-weight: 700; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 10px 20px; border-radius: var(--raio, 3px); cursor: pointer; border: 1.5px solid var(--tinta, #141414); background: var(--papel, #fbfaf7); color: var(--tinta, #141414); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s, color 0.15s; } .ds-btn-sec:hover { background: var(--tinta, #141414); color: var(--papel, #fbfaf7); } .ds-btn-sec:active { transform: translateY(1px) scale(0.98); } .ds-btn-sec:focus-visible { outline: 3px solid var(--azul, #1f4fd1); outline-offset: 3px; }"
+    },
+    {
+      "name": "Botão de Perigo",
+      "kind": "button",
+      "refersTo": "botao-perigo",
+      "description": "Ação destrutiva (apagar projeto); vermelho só aqui e em erro.",
+      "html": "<button class=\"ds-btn-perigo\">Apagar</button>",
+      "css": ".ds-btn-perigo { font-family: var(--fonte, 'Archivo Variable', 'Archivo', system-ui, sans-serif); font-weight: 700; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 10px 20px; border-radius: var(--raio, 3px); cursor: pointer; border: 1.5px solid var(--tinta, #141414); background: var(--papel, #fbfaf7); color: var(--tinta, #141414); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s, color 0.15s; min-height: 38px; padding: 6px 12px; font-size: 0.9rem; border-color: var(--erro, #c4291c); color: var(--erro, #c4291c); } .ds-btn-perigo:hover { background: var(--erro, #c4291c); color: var(--papel, #fbfaf7); } .ds-btn-perigo:focus-visible { outline: 3px solid var(--azul, #1f4fd1); outline-offset: 3px; }"
+    },
+    {
+      "name": "Botão Pequeno de Alternância",
+      "kind": "chip",
+      "refersTo": "botao-pressionado",
+      "description": "Ferramentas da prancha e escolhas rápidas; aria-pressed vira tinta sólida.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip\" aria-pressed=\"true\">Cotas</button><button class=\"ds-chip\" aria-pressed=\"false\">Explodir</button></div>",
+      "css": ".ds-chips { display: flex; gap: 6px; } .ds-chip { font-family: var(--fonte, 'Archivo Variable', 'Archivo', system-ui, sans-serif); font-weight: 700; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 10px 20px; border-radius: var(--raio, 3px); cursor: pointer; border: 1.5px solid var(--tinta, #141414); background: var(--papel, #fbfaf7); color: var(--tinta, #141414); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s, color 0.15s; min-height: 38px; padding: 6px 12px; font-size: 0.9rem; gap: 6px; } .ds-chip:hover, .ds-chip[aria-pressed='true'] { background: var(--tinta, #141414); color: var(--papel, #fbfaf7); } .ds-chip:focus-visible { outline: 3px solid var(--azul, #1f4fd1); outline-offset: 3px; }"
+    },
+    {
+      "name": "Campo de Medida",
+      "kind": "input",
+      "refersTo": "entrada",
+      "description": "Valor tabular com compartimento de unidade.",
+      "html": "<label class=\"ds-campo\"><span class=\"ds-rotulo\">Altura das costas</span><span class=\"ds-entrada\"><input value=\"38\" inputmode=\"decimal\"><span class=\"ds-un\">cm</span></span></label>",
+      "css": ".ds-campo { display: grid; gap: 6px; font-family: var(--fonte, 'Archivo Variable', 'Archivo', system-ui, sans-serif); } .ds-rotulo { font-weight: 700; font-size: 0.95rem; color: var(--tinta, #141414); } .ds-entrada { display: flex; background: var(--papel, #fbfaf7); border: 1.5px solid var(--tinta, #141414); border-radius: var(--raio, 3px); transition: box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1); } .ds-entrada:focus-within { border-color: var(--azul, #1f4fd1); box-shadow: 0 0 0 3px var(--azul-claro, #e2e9fb); } .ds-entrada input { flex: 1; min-width: 0; border: 0; background: transparent; color: inherit; font-family: inherit; font-weight: 600; font-size: 1.15rem; font-variant-numeric: tabular-nums; padding: 11px 12px; outline: none; } .ds-un { display: grid; place-items: center; min-width: 52px; padding: 0 10px; font-weight: 700; color: var(--tinta-2, #57534b); border-left: 1.5px solid var(--tinta, #141414); background: var(--papel-2, #f1efe9); }"
+    },
+    {
+      "name": "Opção",
+      "kind": "card",
+      "refersTo": "opcao-marcada",
+      "description": "Rádio em caixa de traço com letra condensada; marcada fica azul.",
+      "html": "<label class=\"ds-opcao\"><input type=\"radio\" name=\"ds-o\" checked><strong>Cadeira traseira</strong><span>Patas de trás sem força.</span><span class=\"ds-letra\">A</span></label>",
+      "css": ".ds-opcao { position: relative; display: grid; gap: 4px; padding: 16px 16px 16px 56px; cursor: pointer; font-family: var(--fonte, 'Archivo Variable', 'Archivo', system-ui, sans-serif); border: 1.5px solid var(--tinta, #141414); border-radius: var(--raio, 3px); background: var(--papel, #fbfaf7); color: var(--tinta, #141414); transition: background-color 0.15s; } .ds-opcao::before { content: ''; position: absolute; left: 16px; top: 18px; width: 22px; height: 22px; border: 1.5px solid var(--tinta, #141414); border-radius: 50%; background: var(--papel, #fbfaf7); } .ds-opcao:hover { background: var(--papel-2, #f1efe9); } .ds-opcao input { position: absolute; opacity: 0; } .ds-opcao:has(input:checked) { border-color: var(--azul, #1f4fd1); box-shadow: inset 0 0 0 2px var(--azul, #1f4fd1); background: var(--azul-claro, #e2e9fb); } .ds-opcao:has(input:checked)::before { border-color: var(--azul, #1f4fd1); background: radial-gradient(circle, var(--azul, #1f4fd1) 0 5px, var(--papel, #fbfaf7) 6px); } .ds-opcao:has(input:focus-visible) { outline: 3px solid var(--azul, #1f4fd1); outline-offset: 3px; } .ds-letra { position: absolute; right: 14px; top: 10px; font-weight: 900; font-stretch: 62%; font-size: 2rem; line-height: 1; color: var(--cinza-3, #8e897e); }"
+    },
+    {
+      "name": "Abas da Prancha",
+      "kind": "nav",
+      "refersTo": "aba-ativa",
+      "description": "Aba selecionada em tinta com barra azul de 4px; contador em pílula.",
+      "html": "<div class=\"ds-abas\" role=\"tablist\"><button role=\"tab\" aria-selected=\"true\">Peças <span class=\"ds-conta\">6</span></button><button role=\"tab\" aria-selected=\"false\">Materiais</button><button role=\"tab\" aria-selected=\"false\">Montagem</button></div>",
+      "css": ".ds-abas { display: flex; border-bottom: 1.5px solid var(--tinta, #141414); background: var(--papel, #fbfaf7); } .ds-abas button { flex: 1; font-family: var(--fonte, 'Archivo Variable', 'Archivo', system-ui, sans-serif); font-weight: 700; font-size: 0.9rem; border: 0; background: none; color: var(--tinta-2, #57534b); padding: 14px 10px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; justify-content: center; } .ds-abas button:hover { color: var(--tinta, #141414); } .ds-abas button:focus-visible { outline: 3px solid var(--azul, #1f4fd1); outline-offset: 3px; } .ds-abas button[aria-selected='true'] { color: var(--tinta, #141414); box-shadow: inset 0 -4px 0 var(--azul, #1f4fd1); } .ds-conta { font-size: 0.75rem; min-width: 20px; padding: 1px 6px; border-radius: 99px; background: var(--tinta, #141414); color: var(--papel, #fbfaf7); }"
+    },
+    {
+      "name": "Passos Numerados",
+      "kind": "custom",
+      "refersTo": "passo-numero-ativo",
+      "description": "Numeral condensado gigante; o passo ativo acende em azul.",
+      "html": "<ol class=\"ds-passos\"><li>Corte os tubos nas medidas.</li><li data-ativo=\"true\">Encaixe as conexões impressas.</li></ol>",
+      "css": ".ds-passos { list-style: none; margin: 0; padding: 0; counter-reset: p; font-family: var(--fonte, 'Archivo Variable', 'Archivo', system-ui, sans-serif); color: var(--tinta, #141414); } .ds-passos li { counter-increment: p; display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: center; padding: 12px 0; opacity: 0.32; transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1); } .ds-passos li:hover { opacity: 0.6; } .ds-passos li[data-ativo='true'] { opacity: 1; } .ds-passos li::before { content: counter(p); font-weight: 900; font-stretch: 62%; font-size: 4.5rem; line-height: 0.8; } .ds-passos li[data-ativo='true']::before { color: var(--azul, #1f4fd1); }"
+    },
+    {
+      "name": "Carimbo Veterinário",
+      "kind": "custom",
+      "refersTo": "carimbo-vet",
+      "description": "Aviso obrigatório em traço forte de 3px; borda vermelha com pendência.",
+      "html": "<div class=\"ds-vet\"><svg class=\"ds-vet-ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M11 2v2\"/><path d=\"M5 2v2\"/><path d=\"M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1\"/><path d=\"M8 15a6 6 0 0 0 12 0v-3\"/><circle cx=\"20\" cy=\"10\" r=\"2\"/></svg><p><strong>Fale com um veterinário antes.</strong> A cadeira certa depende do diagnóstico.</p></div>",
+      "css": ".ds-vet { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; padding: 16px 18px; border: 3px solid var(--tinta, #141414); border-radius: var(--raio, 3px); background: var(--papel, #fbfaf7); color: var(--tinta, #141414); font-family: var(--fonte, 'Archivo Variable', 'Archivo', system-ui, sans-serif); } .ds-vet p { margin: 0; } .ds-vet strong { display: block; font-weight: 800; } .ds-vet-ico { width: 34px; height: 34px; color: var(--azul, #1f4fd1); }"
+    },
+    {
+      "name": "Rótulos de Cota e Fita",
+      "kind": "custom",
+      "refersTo": "fita-rotulo",
+      "description": "Rótulos flutuantes do 3D: cota em contorno azul, medida atual em azul sólido.",
+      "html": "<div class=\"ds-rotulos\"><span class=\"ds-cota\">comprimento 412 mm</span><span class=\"ds-fita\">38 cm <small>costas</small></span></div>",
+      "css": ".ds-rotulos { display: flex; gap: 12px; align-items: center; } .ds-cota { font-family: var(--fonte, 'Archivo Variable', 'Archivo', system-ui, sans-serif); font-weight: 700; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--azul, #1f4fd1); background: var(--papel, #fbfaf7); padding: 2px 7px; border-radius: 2px; border: 1.5px solid var(--azul, #1f4fd1); } .ds-fita { font-family: var(--fonte, 'Archivo Variable', 'Archivo', system-ui, sans-serif); font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums; color: var(--azul-tinta, #ffffff); background: var(--azul, #1f4fd1); padding: 4px 10px; border-radius: 2px; } .ds-fita small { font-weight: 600; opacity: 0.85; margin-left: 4px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "O Manual de Montagem",
+    "overview": "O Rodante se apresenta como o manual impresso que vem na caixa de um móvel desmontado, só que escrito para um cão específico. A tela é papel branco quente com traço preto. Cada bloco é uma caixa com borda preta fina, os cantos são quase retos e as seções se separam por linhas que atravessam a largura inteira. Os números falam mais alto que as palavras: passos numerados em algarismos pretos gigantes e condensados, contagens `×4` ao lado de cada peça, letras A/B/C para os tipos de cadeira. As figuras não são fotos. São desenhos de traço: o quadro em 3D isométrico com sombreamento de três cinzas e contorno preto, o cão como silhueta de papel contornada, as fitas métricas em azul.\n\nA densidade muda com a tarefa, o mundo não. O Início é editorial e espaçado (seções de até 120px de respiro, títulos de até 5,6rem). O wizard e a prancha são operacionais: colunas fixas, palco 3D grudado ao lado, tabelas com números tabulares. Os dois lados usam as mesmas caixas, o mesmo traço e o mesmo azul. Um único azul marca \"esta peça, a sua medida, a próxima ação\". O vermelho aparece só para erro e para o ✗ dos quadros certo/errado. O tema escuro inverte o papel para quase-preto quente e a tinta para creme, mantendo o mesmo desenho.\n\nO movimento é o de um manual que se monta sozinho: a cadeira explode e se junta conforme a rolagem, a fita métrica desenrola até a medida, a roda anda sobre a fita no carregamento. Tudo usa uma única curva de saída suave e desaparece com `prefers-reduced-motion`. Rejeições confirmadas: a landing de pet em tons pastel com patinhas, e o layout genérico \"título à esquerda, 3D à direita, três cartões\".",
+    "keyCharacteristics": [
+      "Papel quente, traço preto de 1,5px (3px no destaque), cantos de 3px.",
+      "Um azul de ação e seleção; vermelho só para erro.",
+      "Uma família, Archivo variável; a hierarquia vem do eixo de largura (62 a 125) e do peso.",
+      "Números como protagonistas: passos, contagens e letras de tipo condensados e pretos.",
+      "3D ortográfico isométrico com material toon de três tons e contorno em pixels de tela.",
+      "Sem sombras desfocadas: profundidade por traço, por preenchimento tonal e pelo próprio desenho 3D."
+    ],
+    "rules": [
+      {
+        "name": "The Azul Único Rule",
+        "body": "O azul só diz \"esta peça / a sua medida / a ação\". Nenhum título, ícone decorativo ou fundo de seção é azul.",
+        "section": "colors"
+      },
+      {
+        "name": "The Vermelho Só Para Erro Rule",
+        "body": "O vermelho aparece só em erro, perigo e no ✗ do certo/errado. Nunca como enfeite ou chamada de atenção comercial.",
+        "section": "colors"
+      },
+      {
+        "name": "The Três Cinzas Rule",
+        "body": "O sombreamento usa apenas papel, Cinza 1, Cinza 2 e Cinza 3: no 3D (degraus toon), no tubo desenhado em escala (faixas papel/Cinza 1/Cinza 2) e nas figuras 2D.",
+        "section": "colors"
+      },
+      {
+        "name": "The Número Condensado Rule",
+        "body": "Todo número que conta ou ordena (passo, quantidade, letra de tipo) usa peso 900 em largura 62. Ele é o elemento mais visível do bloco.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Rule",
+        "body": "Toda medida, quantidade e milímetro usa algarismos tabulares, para as colunas alinharem.",
+        "section": "typography"
+      },
+      {
+        "name": "The Traço, Não Sombra Rule",
+        "body": "Toda `box-shadow` do sistema é uma linha sólida sem desfoque. Para separar ou elevar algo, use borda de tinta ou preenchimento tonal.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** contornar toda caixa com traço de tinta de 1,5px e cantos de 3px; use 3px de traço só para o que precisa de peso (carimbo veterinário, certo/errado).",
+      "**Do** reservar o azul para seleção, medida atual, foco e ação principal, com no máximo um botão primário por grupo de ações.",
+      "**Do** escrever todo número de passo, contagem e letra de tipo em peso 900, largura 62; toda medida em algarismos tabulares.",
+      "**Do** desenhar o 3D com o material de manual (toon de três tons e contorno em pixels de tela), lendo as cores das variáveis CSS.",
+      "**Do** manter o cão como papel chapado com contorno; o sombreamento em cinzas fica para as peças.",
+      "**Do** separar seções com linhas de tinta de ponta a ponta e deixar o palco 3D grudado ao lado do conteúdo que rola.",
+      "**Do** oferecer reserva 2D (miniatura SVG isométrica ou ilustração com fita) sempre que o 3D não puder rodar.",
+      "**Do** usar ícones lucide com traço 1,75 em 1,2em, e a curva `cubic-bezier(0.16, 1, 0.3, 1)` em todo movimento, desligado com `prefers-reduced-motion`."
+    ],
+    "donts": [
+      "**Don't** usar sombra desfocada para elevar cartões, botões ou painéis.",
+      "**Don't** introduzir uma segunda cor de destaque, gradiente decorativo ou tons pastel.",
+      "**Don't** usar vermelho fora de erro, perigo e o ✗ do certo/errado.",
+      "**Don't** usar fotos, patinhas ou ilustrações fofas; figuras são desenho de traço.",
+      "**Don't** arredondar caixas além de 3px nem transformar botões em pílulas.",
+      "**Don't** usar uma segunda família tipográfica; a hierarquia vem da largura e do peso do Archivo.",
+      "**Don't** escrever cores fixas no código do 3D ou dos SVGs; use as variáveis."
+    ]
+  }
+}

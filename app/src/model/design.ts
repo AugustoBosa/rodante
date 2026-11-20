@@ -76,6 +76,9 @@ export const TIPOS: { id: TipoCadeira; nome: string; desc: string }[] = [
   },
 ]
 
+/** Letra de cada tipo, como as vistas A/B/C de um manual. */
+export const LETRA_TIPO: Record<TipoCadeira, string> = { traseira: 'A', dianteira: 'B', quatro: 'C' }
+
 const PATAS: Record<TipoCadeira, string> = {
   traseira: tr('as patas traseiras', 'the hind paws'),
   dianteira: tr('as patas dianteiras', 'the front paws'),

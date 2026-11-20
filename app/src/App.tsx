@@ -24,14 +24,14 @@ function useRota(): string[] {
 
 function Marca() {
   return (
-    <a className="marca" href="#/">
-      <svg viewBox="0 0 30 30" aria-hidden="true">
-        <circle cx="10" cy="21" r="7" fill="none" stroke="currentColor" strokeWidth="2.5" />
-        <circle cx="10" cy="21" r="2" fill="currentColor" />
-        <path d="M10 21 V8 H26" fill="none" stroke="currentColor" strokeWidth="2.5" />
-        <rect x="14" y="5" width="10" height="5" fill="var(--fita)" />
+    <a className="marca" href="#/" aria-label="Rodante">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="11" cy="22" r="7.5" fill="var(--papel)" stroke="currentColor" strokeWidth="2.5" />
+        <circle cx="11" cy="22" r="2" fill="var(--azul)" />
+        <path d="M11 22 L11 9 H29" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" />
+        <path d="M11 15 L17 9" fill="none" stroke="currentColor" strokeWidth="2.5" />
       </svg>
-      Rodante
+      <span>Rodante</span>
     </a>
   )
 }
@@ -71,7 +71,7 @@ export default function App() {
       </Suspense>
     )
   else if (rota === 'p')
-    pagina = <p className="pagina">{linkInvalido
+    pagina = <p className="projetos">{linkInvalido
           ? tr('Este link de projeto está incompleto ou corrompido. Peça um novo link a quem compartilhou.', 'This project link is incomplete or corrupted. Ask whoever shared it for a new link.')
           : tr('Abrindo projeto compartilhado…', 'Opening shared project…')}</p>
   else pagina = <Inicio />
@@ -82,10 +82,11 @@ export default function App() {
         <Marca />
         <nav aria-label={tr('Principal', 'Main')}>
           <a href="#/novo" aria-current={rota === 'novo' ? 'page' : undefined}>
-            {tr('Novo projeto', 'New project')}
+            {tr('Novo', 'New')}<span className="rotulo-longo"> {tr('projeto', 'project')}</span>
           </a>
           <a href="#/projetos" aria-current={rota === 'projetos' ? 'page' : undefined}>
-            {tr('Meus projetos', 'My projects')}
+            <span className="rotulo-longo">{tr('Meus projetos', 'My projects')}</span>
+            <span aria-hidden="true" className="rotulo-curto">{tr('Projetos', 'Projects')}</span>
           </a>
           <button className="idioma" onClick={() => trocarIdioma(idioma === 'en' ? 'pt' : 'en')} lang={idioma === 'en' ? 'pt-BR' : 'en'}>
             {idioma === 'en' ? 'Português' : 'English'}
@@ -93,12 +94,17 @@ export default function App() {
         </nav>
       </header>
       <main ref={main} tabIndex={-1}>{pagina}</main>
-      {rota !== 'projeto' && (
+      {rota !== 'projeto' && rota !== 'novo' && (
         <footer className="rodape">
-          {tr(
-            'Rodante é gratuito e de código aberto (MIT). Os projetos ficam só no seu navegador. Nenhum projeto substitui a avaliação de um veterinário.',
-            'Rodante is free and open source (MIT). Projects stay in your browser only. No design replaces a vet assessment.',
-          )}
+          <p>
+            {tr(
+              'Rodante é gratuito e de código aberto (MIT). Os projetos ficam só no seu navegador. Nenhum projeto substitui a avaliação de um veterinário.',
+              'Rodante is free and open source (MIT). Projects stay in your browser only. No design replaces a vet assessment.',
+            )}
+          </p>
+          <p>
+            {tr('Cão 3D: Shiba Inu por Quaternius (CC0). Silhueta: Margot Michaud (CC0).', '3D dog: Shiba Inu by Quaternius (CC0). Silhouette: Margot Michaud (CC0).')}
+          </p>
         </footer>
       )}
     </>

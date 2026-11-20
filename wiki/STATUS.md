@@ -23,7 +23,8 @@
 5. Abrir o **STEP do conjunto** num CAD (FreeCAD/Fusion) e conferir a posição das peças. Hoje só sabemos que o arquivo é gerado (a rotação das peças tem teste unitário em `pecas.test.ts`).
 6. Abrir o **.zip em inglês** e conferir nomes de arquivo, CSV (`,` e ponto decimal) e README.
 7. Refazer a **impressão da prancha em PDF** (Ctrl+P) depois das mudanças da rodada 3.
-8. **Celular:** tela de carregamento e miniaturas da lista só foram vistas no desktop.
+8. **Celular:** conferido só em emulação (390 px). Falta testar num celular real, em especial o 3D do cão (peso ~0,85 MB do modelo + WebGL).
+8b. **Rótulos 3D em modo dev:** com StrictMode, o primeiro rótulo `<Html>` do drei às vezes some e o console mostra "synchronously unmount a root". No build de produção não acontece (sem StrictMode).
 
 ### Técnico
 9. **Push em `master` não dispara o workflow** `deploy.yml` (0 execuções por push desde a criação do repo; Actions habilitado, workflow ativo, 0 webhooks). Causa não encontrada. Contorno: `gh workflow run` depois do push.
@@ -46,6 +47,8 @@
 - **Segurança:** aviso veterinário em Início, Revisão (checkbox obrigatório) e Prancha; erro bloqueia o .zip.
 - **Idiomas:** pt-BR e inglês via `tr('pt', 'en')` em `app/src/i18n.ts`; padrão pelo navegador; botão no topo.
 - **Grafo:** graphify com Haiku na extração semântica (pedido do usuário).
+- **Visual (2026-11-20, rodada 4):** mundo "manual de montagem" escolhido pelo usuário (impeccable): papel branco, traço preto, 3 cinzas, um azul só para "esta peça / sua medida / ação", vermelho só para erro. Fonte Archivo (auto-hospedada via `@fontsource-variable/archivo`), ícones `lucide-react`. 3D em toon + contorno, câmera ortográfica isométrica. Contexto em `PRODUCT.md` e `.impeccable/surfaces/`.
+- **Cão:** Shiba Inu 3D de Quaternius (CC0) em `app/public/modelos/shiba.glb`; reserva 2D com silhueta CC0 (Margot Michaud, PhyloPic). Créditos em `app/public/modelos/LICENCAS.txt` e no rodapé.
 
 ## Mapa do código (`app/src/`)
 | Arquivo | O que faz |
@@ -55,8 +58,11 @@
 | `model/defaults.ts` | Todos os valores de calibração e limites |
 | `cad/pecas.ts` | Peças Replicad (cotovelo, tê, suporte do eixo, ponteira, clip) + `eixoAngulo` |
 | `cad/worker.ts` | Download do WASM com progresso, cache, STL/STEP por peça, STEP do conjunto |
-| `ui/Prancha.tsx` · `ui/Vista3D.tsx` | Prancha técnica, 3D, cotas, vistas, vista explodida |
-| `ui/Wizard.tsx` · `ui/Ilustracao.tsx` | Wizard de 5 passos e desenhos de medida |
+| `ui/Prancha.tsx` · `ui/Vista3D.tsx` | Prancha técnica, 3D ortográfico, cotas, vistas, vista explodida, cão na cadeira, peça destacada |
+| `ui/Wizard.tsx` · `ui/Ilustracao.tsx` | Wizard de 5 passos (palco 3D à esquerda) e reserva 2D das medidas |
+| `ui/Cao3D.tsx` · `ui/PalcoMedida.tsx` | Cão 3D (mede o esqueleto, escala pelas medidas, contorno de manual) e palco com a fita que desenrola |
+| `ui/Inicio.tsx` · `ui/PecasVitrine.tsx` · `ui/PalcoProjeto.tsx` | Vitrine: capa com o cão andando na cadeira, inventário de peças CAD reais, montagem guiada pela rolagem |
+| `ui/tinta3d.tsx` · `ui/tela.ts` · `ui/usePecas.ts` · `ui/exemplo.ts` | Visual de manual no 3D · detecção de WebGL/visibilidade · motor CAD compartilhado · cão de exemplo |
 | `ui/Projetos.tsx` · `ui/Miniatura.tsx` | Lista de projetos com miniatura isométrica |
 | `ui/Carregando.tsx` | Tela de carregamento (roda na fita métrica) |
 | `store.ts` · `saidas.ts` · `i18n.ts` | Persistência/link/validação · zip/CSV/LEIA-ME · idiomas |
@@ -66,4 +72,5 @@
 - **2026-11-20, F0–F1:** setup e spike CAD (cotovelo Replicad → STL).
 - **2026-11-20, F2–F7:** app completo (modelo, peças, wizard, prancha, saídas, deploy). Lighthouse 100.
 - **2026-11-20, publicação:** repo público + GitHub Pages pela branch `gh-pages`.
+- **2026-11-20, rodada 4:** nova UI/UX do zero (skill impeccable): tela cheia no PC, celular revisto, cão 3D nas medidas e na prancha, vitrine animada.
 - **2026-11-20, rodada 3:** dianteira e 4 rodas, STEP por peça e do conjunto, vista explodida, miniaturas, carregamento animado, inglês, favicon próprio, grafo graphify (Haiku) com hook de commit.
