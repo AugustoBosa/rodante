@@ -24,7 +24,10 @@ npm run build    # gera app/dist (site estático)
 
 ## Publicar
 
-`.github/workflows/deploy.yml` testa, compila e publica no GitHub Pages a cada push em `master`. No repositório do GitHub, ative **Settings → Pages → Source: GitHub Actions**.
+No ar em **https://augustobosa.github.io/rodante/**. O GitHub Pages publica a branch `gh-pages`, que contém só o `app/dist` compilado.
+
+- Automático: `.github/workflows/deploy.yml` testa, compila e atualiza a `gh-pages` a cada push em `master`.
+- Manual, se o Actions estiver fora: rode `npm run build` em `app/` e envie o conteúdo de `app/dist` (mais um `.nojekyll`) para a branch `gh-pages`.
 
 ## Estrutura
 
