@@ -5,7 +5,7 @@
 ## Retomar aqui
 - **Site no ar:** https://augustobosa.github.io/rodante/ · repo público https://github.com/AugustoBosa/rodante (branch `master`; o site é servido da branch `gh-pages`).
 - **Último commit publicado:** `1d6fa64` (rodada 3). Árvore limpa depois dele, exceto este STATUS.
-- **Rodar:** `cd app && npm install && npm run dev`. **Testes:** `npm test` (21). **Lint:** `npm run lint`.
+- **Rodar:** `cd app && npm install && npm run dev`. **Testes:** `npm test` (25). **Lint:** `npm run lint`.
 - **Publicar:** push em `master` e depois **disparar o deploy à mão** (o push não dispara, ver Em aberto → Técnico):
   `gh workflow run deploy.yml -R AugustoBosa/rodante --ref master`
 - **Grafo:** `graphify-out/` (local, fora do git). Perguntas sobre o código: `graphify query "<pergunta>"`. O hook `post-commit` atualiza o código sozinho; depois de commitar docs (`wiki/`, `docs/`, `README.md`), rodar `/graphify . --update` com **subagentes Haiku**.
@@ -17,7 +17,7 @@
 1. **Calibrar `folgaImpressao`** (hoje 0,4 mm, chute) em `app/src/model/defaults.ts`: imprimir um tê, testar no tubo real e anotar a folga que encaixa firme.
 2. **Montar uma cadeira de teste.** Dianteira e 4 rodas nunca foram montadas: geometria testada só em código e na tela.
 3. **Resistência das peças:** nenhuma conexão teve teste de carga. O clip da sela em PETG pode trincar ao encaixar (TPU é alternativa).
-4. **Valores padrão sem fonte** (todos em `defaults.ts`): Ø do tubo por faixa de peso, folga lateral 3 cm, limite 40 kg, PVC até 12 kg, diferença máxima de 15% entre pernas (4 rodas), abaixar o quadro 2 cm. Validar com montagem real e, se possível, fisioterapeuta veterinário.
+4. **Valores padrão sem fonte** (todos em `defaults.ts`): Ø do tubo por faixa de peso, folga lateral 3 cm, limite 40 kg, PVC até 12 kg, diferença máxima de 15% entre pernas (4 rodas), abaixar o quadro 2 cm, garupa 0,30 e peito 0,17 do comprimento (medidos só no modelo 3D do Shiba). Validar com montagem real e, se possível, fisioterapeuta veterinário.
 
 ### Não verificado (fazer quando der)
 5. Abrir o **STEP do conjunto** num CAD (FreeCAD/Fusion) e conferir a posição das peças. Hoje só sabemos que o arquivo é gerado (a rotação das peças tem teste unitário em `pecas.test.ts`).
@@ -50,6 +50,8 @@
 - **Visual (2026-11-20, rodada 4):** mundo "manual de montagem" escolhido pelo usuário (impeccable): papel branco, traço preto, 3 cinzas, um azul só para "esta peça / sua medida / ação", vermelho só para erro. Fonte Archivo (auto-hospedada via `@fontsource-variable/archivo`), ícones `lucide-react`. 3D em toon + contorno, câmera ortográfica isométrica. Contexto em `PRODUCT.md` e `.impeccable/surfaces/`.
 - **Cores das peças (pedido do usuário):** cada tipo de peça impressa tem uma cor (`app/src/ui/coresPecas.ts`), igual no 3D, inventário, lista e miniaturas; azul continua só para destaque/ação. Traço fino (1–1,6 px).
 - **Cão na cadeira:** escala pela perna que define o trilho (trilho logo abaixo da barriga); patas apoiadas nas rodas não andam (trilhas da animação removidas). Cintas da sela, arnês e ligações desenhadas em 3D; fita e velcro calculados em `cintas()` (`model/bom.ts`, comprimentos estimados).
+- **Espaçamento das peças:** cada conexão ocupa `recuo + profundidade` do tubo (`alcance()` em `design.ts`); entre duas bocas sobra ≥ 20 mm de tubo visível e os clips da sela ficam no tubo livre, um de cada lado da perna do cão. A diagonal de 45° só entra quando cabe; cão baixo sai sem ela, com aviso. O trilho além do eixo é no mínimo o que cabe as peças e deixa a barra atrás da garupa ou à frente do peito.
+- **Cão na escala certa:** a escala na cadeira vem da prega da coxa (traseira) ou da axila (dianteira), lidas no fundo do tronco do modelo, não nos ossos da perna. Patas: na traseira as de trás ficam paradas e as da frente andam; na dianteira, o contrário (confirmado com o usuário).
 - **Cão:** Shiba Inu 3D de Quaternius (CC0) em `app/public/modelos/shiba.glb`; reserva 2D com silhueta CC0 (Margot Michaud, PhyloPic). Créditos em `app/public/modelos/LICENCAS.txt` e no rodapé.
 
 ## Mapa do código (`app/src/`)

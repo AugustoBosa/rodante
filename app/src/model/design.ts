@@ -5,8 +5,10 @@ import {
   DIFERENCA_PERNAS_MAX,
   FITA_L,
   FOLGA_LATERAL_MIN_CM,
+  GARUPA_FRACAO,
   LIMITE_PESO_KG,
   LIMITES,
+  PEITO_FRACAO,
   PVC_PESO_MAX_KG,
   SEGMENTO_MIN_MM,
   tuboMinimo,
@@ -32,6 +34,11 @@ export function recuo(s: SpecPeca): number {
   if (s.tipo === 'suporteEixo') return (s.eixoD + s.folga) / 2 + s.parede + BATENTE
   const meio = (anguloMinimo(s) / 2) * (Math.PI / 180)
   return (meio >= Math.PI / 2 - 1e-9 ? 0 : raioInterno(s) / Math.tan(meio)) + BATENTE
+}
+
+/** Até onde a conexão ocupa o tubo, a partir do centro: recuo + boca do encaixe. Duas conexões no mesmo tubo não podem se cruzar. */
+export function alcance(s: SpecPeca): number {
+  return s.tipo === 'clipSela' ? 0 : recuo(s) + s.profundidade
 }
 
 /** Comprimento do clip ao longo do tubo: fita + 1 mm de folga + 4 mm de cada lado. */
@@ -111,54 +118,70 @@ export function computeDesign(p: Projeto): Design {
   const H = (pernaBase - aj.ajusteAlturaCm) * 10 // centro do trilho
   const R = m.rodaD / 2 // centro do eixo
   const L = md.comprimentoCm * 10 // ombro → quadril
-  const ext = aj.extensaoTraseiraMm // trilho além do eixo até a barra
   const larguraInterna = (md.larguraCm + 2 * aj.folgaLateralCm) * 10
   const yC = larguraInterna / 2 + ro
   const yRoda = yC + ro + 5 + m.rodaLargura / 2
+  const G = SEGMENTO_MIN_MM // tubo visível mínimo entre duas bocas
+  const cl = comprimentoClip({ fitaL: FITA_L })
+  const [a90, a45] = [alcance(te90), alcance(te45)]
+
+  const pontaFrente = p.tipo === 'traseira' ? pont : cot
+  const pontaTras = p.tipo === 'dianteira' ? pont : cot
+  // Trilho além do eixo até a ponta: o que o usuário pediu, mas no mínimo o tê + um clip + a ponta,
+  // e com a barra atrás da garupa (traseira) ou à frente do peito (dianteira).
+  const extensao = (fracao: number, ponta: SpecPeca) => Math.ceil(Math.max(aj.extensaoTraseiraMm, a90 + G + cl + G + alcance(ponta), fracao * L + ro + 20))
+  const extF = p.tipo === 'traseira' ? 0 : extensao(PEITO_FRACAO, pontaFrente)
+  const extT = p.tipo === 'dianteira' ? 0 : extensao(GARUPA_FRACAO, pontaTras)
+  const xFim = extF + L + extT
 
   // X para trás. Cada eixo tem diagonal a 45° apontando para dentro do quadro (s = sentido em X).
-  // traseira: ponteira na frente (x=0), eixo sob o quadril, barra atrás.
-  // dianteira: barra na frente, eixo sob o ombro, ponteira atrás (presa no arnês do quadril).
+  // traseira: ponteira na frente (x=0, sob o ombro), eixo sob o quadril, barra atrás da garupa.
+  // dianteira: barra à frente do peito, eixo sob o ombro, ponteira atrás (presa no arnês do quadril).
   // quatro: barra nas duas pontas, um eixo sob o ombro e outro sob o quadril.
   const eixos: { x: number; s: 1 | -1; nome: string }[] =
     p.tipo === 'traseira'
       ? [{ x: L, s: -1, nome: '' }]
       : p.tipo === 'dianteira'
-        ? [{ x: ext, s: 1, nome: '' }]
+        ? [{ x: extF, s: 1, nome: '' }]
         : [
-            { x: ext, s: 1, nome: tr(' dianteira', ' (front)') },
-            { x: ext + L, s: -1, nome: tr(' traseira', ' (rear)') },
+            { x: extF, s: 1, nome: tr(' dianteira', ' (front)') },
+            { x: extF + L, s: -1, nome: tr(' traseira', ' (rear)') },
           ]
-  const xFim = p.tipo === 'traseira' ? L + ext : p.tipo === 'dianteira' ? ext + L : 2 * ext + L
-  const pontaFrente = p.tipo === 'traseira' ? pont : cot
-  const pontaTras = p.tipo === 'dianteira' ? pont : cot
-  const livre = p.tipo === 'quatro' ? L / 2 : L // espaço entre o eixo e a outra ponta
-  const span = Math.max(0, Math.min(livre, H - R) * 0.5) // diagonal ocupa metade do espaço livre
+  // espaço de cada eixo para dentro: até a boca da ponta oposta, ou até o meio (4 rodas)
+  const espaco = p.tipo === 'quatro' ? L / 2 : L - alcance(p.tipo === 'traseira' ? pontaFrente : pontaTras)
+  // Diagonal: as bocas dos tês não podem se cruzar no trilho, na perna nem na própria diagonal.
+  // Ideal: metade do espaço livre; no máximo o que ainda deixa lugar para o clip de dentro.
+  const spanMax = espaco - (a45 + G + cl + G)
+  const span = Math.max(a90 + a45 + G, (2 * a45 + G) / Math.SQRT2, Math.min(espaco * 0.5, (H - R) * 0.5, spanMax))
+  const temDiagonal = span <= spanMax && H - R - span >= a45 + alcance(sup) + G
   const z1 = H - span
+  const interno = temDiagonal ? span + a45 : a90 // até onde vão as peças do eixo, para dentro
+  const semLugarClip = interno + G + cl + G > espaco
 
   const tubos: Tubo[] = []
   const juntas: Junta[] = []
+  const curtos: string[] = []
   const tubo = (nome: string, A: V3, B: V3, sA: SpecPeca, sB: SpecPeca) => {
     const d = dist(A, B)
     const u = scale(sub(B, A), 1 / (d || 1))
     const rA = recuo(sA)
     const rB = recuo(sB)
     tubos.push({ nome, a: add(A, scale(u, rA)), b: sub(B, scale(u, rB)), comprimento: round(d - rA - rB) })
+    if (d - alcance(sA) - alcance(sB) < G - 0.01) curtos.push(nome)
   }
   /** Conexão na ponta do trilho: ponteira (tubo sai para dentro) ou cotovelo virando para o outro lado. */
   const juntaPonta = (spec: SpecPeca, x: number, y: number, dentro: 1 | -1): Junta =>
     spec.tipo === 'ponteira'
       ? { spec, pos: [x, y, H], ex: [0, 0, 1], ey: [0, dentro, 0] }
       : { spec, pos: [x, y, H], ex: [dentro, 0, 0], ey: [0, Math.sign(-y), 0] }
+  /** Clip da sela centrado em x (origem na borda do clip, Z local = +X). */
+  const juntaClip = (x: number, y: number): Junta => ({ spec: clip, pos: [x - cl / 2, y, H], ex: [0, 0, 1], ey: [0, -1, 0] })
 
   for (const [lado, y] of [[tr('esq', 'left'), -yC], [tr('dir', 'right'), yC]] as const) {
     // paradas ao longo do trilho, em ordem de X
     const paradas: { x: number; spec: SpecPeca }[] = [
       { x: 0, spec: pontaFrente },
-      ...eixos.flatMap((e) => [
-        { x: e.x, spec: te90 },
-        { x: e.x + e.s * span, spec: te45 },
-      ]),
+      ...eixos.flatMap((e) => [{ x: e.x, spec: te90 }, ...(temDiagonal ? [{ x: e.x + e.s * span, spec: te45 }] : [])]),
       { x: xFim, spec: pontaTras },
     ].sort((a, b) => a.x - b.x)
     paradas.forEach((pa, i) => {
@@ -167,36 +190,42 @@ export function computeDesign(p: Projeto): Design {
     juntas.push(juntaPonta(pontaFrente, 0, y, 1), juntaPonta(pontaTras, xFim, y, -1))
     for (const e of eixos) {
       const E: V3 = [e.x, y, H]
-      const D: V3 = [e.x + e.s * span, y, H]
-      const P: V3 = [e.x, y, z1]
       const S: V3 = [e.x, y, R]
-      tubo(`${tr('Perna superior', 'Upper leg')}${e.nome} (${lado})`, E, P, te90, te45)
-      tubo(`${tr('Perna inferior', 'Lower leg')}${e.nome} (${lado})`, P, S, te45, sup)
-      tubo(`${tr('Diagonal', 'Brace')}${e.nome} (${lado})`, D, P, te45, te45)
-      juntas.push(
-        { spec: te45, pos: D, ex: [-e.s, 0, 0], ey: [0, 0, -1] },
-        { spec: te90, pos: E, ex: [1, 0, 0], ey: [0, 0, -1] },
-        { spec: te45, pos: P, ex: [0, 0, 1], ey: [e.s, 0, 0] },
-        { spec: sup, pos: S, ex: [1, 0, 0], ey: [0, 1, 0] },
-      )
-      // clips da sela: entre o eixo e a diagonal, e entre o eixo e a ponta (origem na borda do clip, Z local = +X)
+      if (temDiagonal) {
+        const D: V3 = [e.x + e.s * span, y, H]
+        const P: V3 = [e.x, y, z1]
+        tubo(`${tr('Perna superior', 'Upper leg')}${e.nome} (${lado})`, E, P, te90, te45)
+        tubo(`${tr('Perna inferior', 'Lower leg')}${e.nome} (${lado})`, P, S, te45, sup)
+        tubo(`${tr('Diagonal', 'Brace')}${e.nome} (${lado})`, D, P, te45, te45)
+        juntas.push({ spec: te45, pos: D, ex: [-e.s, 0, 0], ey: [0, 0, -1] }, { spec: te45, pos: P, ex: [0, 0, 1], ey: [e.s, 0, 0] })
+      } else tubo(`${tr('Perna', 'Leg')}${e.nome} (${lado})`, E, S, te90, sup)
+      juntas.push({ spec: te90, pos: E, ex: [1, 0, 0], ey: [0, 0, -1] }, { spec: sup, pos: S, ex: [1, 0, 0], ey: [0, 1, 0] })
+      // clips da sela, um de cada lado da perna do cão: logo depois das peças do eixo (para dentro)
+      // e no meio do trecho livre entre o eixo e a ponta (para fora)
       const ponta = e.s === -1 ? xFim : 0
-      for (const x of [e.x + (e.s * span) / 2, (e.x + ponta) / 2])
-        juntas.push({ spec: clip, pos: [x - comprimentoClip({ fitaL: FITA_L }) / 2, y, H], ex: [0, 0, 1], ey: [0, -1, 0] })
+      const aPonta = alcance(e.s === -1 ? pontaTras : pontaFrente)
+      juntas.push(juntaClip(e.x + e.s * (interno + G + cl / 2), y), juntaClip((e.x - e.s * a90 + ponta + e.s * aPonta) / 2, y))
     }
   }
   if (pontaFrente.tipo === 'cotovelo') tubo(tr('Barra dianteira', 'Front crossbar'), [0, -yC, H], [0, yC, H], cot, cot)
   if (pontaTras.tipo === 'cotovelo') tubo(tr('Barra traseira', 'Rear crossbar'), [xFim, -yC, H], [xFim, yC, H], cot, cot)
 
-  const curtos = tubos.filter((t) => t.comprimento < SEGMENTO_MIN_MM)
-  if (H - R <= 0 || curtos.length)
+  if (H - R <= 0 || curtos.length || semLugarClip)
     alertas.push({
       nivel: 'erro',
       texto: ((lista) =>
         tr(
           `Não cabe: ${lista || 'perna'} fica curto demais. Use roda menor (hoje Ø ${m.rodaD} mm) ou confira a altura da perna.`,
           `Does not fit: ${lista || 'leg'} is too short. Use a smaller wheel (now Ø ${m.rodaD} mm) or check the leg height.`,
-        ))([...new Set(curtos.map((t) => t.nome.replace(/ \([^)]*\)$/, '').toLowerCase()))].join(', ')),
+        ))([...new Set([...curtos.map((t) => t.replace(/ \([^)]*\)$/, '').toLowerCase()), ...(semLugarClip ? [tr('trilho', 'rail')] : [])])].join(', ')),
+    })
+  else if (!temDiagonal)
+    alertas.push({
+      nivel: 'aviso',
+      texto: tr(
+        `Quadro baixo para a diagonal de reforço: sai sem ela e fica menos rígido. Uma roda menor (hoje Ø ${m.rodaD} mm) devolve a diagonal.`,
+        `Frame too low for the 45° brace: it is left out and the frame is less rigid. A smaller wheel (now Ø ${m.rodaD} mm) brings the brace back.`,
+      ),
     })
   if (cao.pesoKg > LIMITE_PESO_KG)
     alertas.push({ nivel: 'erro', texto: tr(`Peso acima de ${LIMITE_PESO_KG} kg: este projeto caseiro não é indicado. Procure um fabricante profissional.`, `Weight above ${LIMITE_PESO_KG} kg: this home-made design is not suitable. Look for a professional manufacturer.`) })

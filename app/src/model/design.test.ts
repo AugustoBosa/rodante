@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
-import { computeDesign, recuo } from './design'
+import { alcance, comprimentoClip, computeDesign, recuo } from './design'
 import { bom, cintas, comprados, cortes, csv } from './bom'
-import { AJUSTES_PADRAO, MATERIAIS_PADRAO } from './defaults'
+import { AJUSTES_PADRAO, FITA_L, GARUPA_FRACAO, MATERIAIS_PADRAO, PEITO_FRACAO, SEGMENTO_MIN_MM } from './defaults'
 import type { Projeto } from './types'
 
 const projeto = (over: { peso: number; raca: string; perna: number; comp: number; larg: number; costas: number }, mat = {}): Projeto => ({
@@ -24,10 +24,10 @@ const labrador = projeto({ peso: 35, raca: 'labrador', perna: 45, comp: 65, larg
 const erros = (p: Projeto) => computeDesign(p).alertas.filter((a) => a.nivel === 'erro')
 
 test('casos típicos montam sem erro e com cortes positivos', () => {
-  for (const p of [dachshund, srd, labrador]) {
+  for (const [p, n] of [[dachshund, 7], [srd, 13], [labrador, 13]] as const) {
     const d = computeDesign(p)
     expect(erros(p)).toEqual([])
-    expect(d.tubos).toHaveLength(13)
+    expect(d.tubos).toHaveLength(n) // cão baixo: sem diagonal
     for (const t of d.tubos) expect(t.comprimento).toBeGreaterThanOrEqual(20)
   }
 })
@@ -84,7 +84,8 @@ test('dianteira: espelho da traseira, ponteira atrás e barra na frente', () => 
   expect(d.tubos).toHaveLength(13)
   expect(d.tubos.some((t) => t.nome === 'Barra dianteira')).toBe(true)
   expect(d.cotas.alturaTrilho).toBe((36 - AJUSTES_PADRAO.ajusteAlturaCm) * 10)
-  expect(d.rodas.every((r) => r.pos[0] === AJUSTES_PADRAO.extensaoTraseiraMm)).toBe(true) // eixo sob o ombro
+  expect(d.rodas[0].pos[0]).toBeGreaterThanOrEqual(PEITO_FRACAO * 500) // barra à frente do peito
+  expect(d.rodas.every((r) => r.pos[0] === d.rodas[0].pos[0])).toBe(true) // um eixo, sob o ombro
 })
 
 test('quatro rodas: dois eixos, duas barras, sem ponteira, nivelado pela perna mais curta', () => {
@@ -111,4 +112,46 @@ test('cintas: uma por par de clips, uma ligação por ponteira, fita somada na l
   const fita = comprados(srd, d).find((l) => l.un === 'm')!
   expect(fita.qtd).toBe(c.fitaM)
   expect(comprados(srd, d).some((l) => /impresso|printed/.test(l.item))).toBe(false)
+})
+
+test('nenhuma peça se sobrepõe: entre duas bocas sobra tubo e os clips ficam no tubo livre', () => {
+  const prof = AJUSTES_PADRAO.profundidade
+  const cl = comprimentoClip({ fitaL: FITA_L })
+  for (const base of [dachshund, srd, labrador])
+    for (const tipo of ['traseira', 'dianteira', 'quatro'] as const) {
+      const p: Projeto = { ...base, tipo, medidas: { ...base.medidas, alturaPernaDianteiraCm: base.medidas.alturaPernaCm } }
+      const d = computeDesign(p)
+      expect(erros(p), `${base.cao.raca} ${tipo}`).toEqual([])
+      // cada ponta de tubo entra `prof` na boca: o que sobra é o tubo visível entre duas conexões
+      for (const t of d.tubos) expect(t.comprimento - 2 * prof, `${base.cao.raca} ${tipo} ${t.nome}`).toBeGreaterThanOrEqual(SEGMENTO_MIN_MM - 0.5)
+      const H = d.juntas.find((j) => j.spec.tipo === 'clipSela')!.pos[2]
+      for (const y of [-1, 1]) {
+        const noTrilho = d.juntas.filter((j) => Math.sign(j.pos[1]) === y && j.pos[2] === H)
+        const clips = noTrilho.filter((j) => j.spec.tipo === 'clipSela').map((j) => [j.pos[0], j.pos[0] + cl])
+        const outras = noTrilho.filter((j) => j.spec.tipo !== 'clipSela').map((j) => [j.pos[0] - alcance(j.spec), j.pos[0] + alcance(j.spec)])
+        for (const [a, b] of clips) {
+          for (const [c, e] of [...outras, ...clips.filter(([x]) => x !== a)])
+            expect(b <= c || e <= a, `${base.cao.raca} ${tipo}: clip em ${a} encosta em [${c}, ${e}]`).toBe(true)
+        }
+      }
+    }
+})
+
+test('diagonal só quando cabe: cão baixo sai sem tê 45° e com aviso', () => {
+  const baixo = computeDesign(dachshund)
+  expect(baixo.pecas.some((pc) => pc.spec.tipo === 'te' && pc.spec.angulo === 45)).toBe(false)
+  expect(baixo.alertas.some((a) => a.nivel === 'aviso' && a.texto.includes('diagonal'))).toBe(true)
+  const alto = computeDesign(srd)
+  expect(alto.pecas.some((pc) => pc.spec.tipo === 'te' && pc.spec.angulo === 45)).toBe(true)
+  expect(alto.alertas.some((a) => a.texto.includes('diagonal'))).toBe(false)
+})
+
+test('barras fora do corpo: atrás da garupa e à frente do peito', () => {
+  const L = 500
+  const tras = computeDesign(srd)
+  expect(tras.cotas.comprimentoTrilho - tras.rodas[0].pos[0]).toBeGreaterThanOrEqual(GARUPA_FRACAO * L)
+  const quatro = computeDesign({ ...srd, tipo: 'quatro', medidas: { ...srd.medidas, alturaPernaDianteiraCm: 35 } })
+  const xs = quatro.rodas.map((r) => r.pos[0])
+  expect(Math.min(...xs)).toBeGreaterThanOrEqual(PEITO_FRACAO * L)
+  expect(quatro.cotas.comprimentoTrilho - Math.max(...xs)).toBeGreaterThanOrEqual(GARUPA_FRACAO * L)
 })

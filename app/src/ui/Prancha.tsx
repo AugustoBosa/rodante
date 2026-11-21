@@ -46,7 +46,7 @@ const CAMPOS_MATERIAIS: [keyof Omit<Materiais, 'tubo'>, string, boolean][] = [
 const CAMPOS_AJUSTES: [keyof Ajustes, string, string, string][] = [
   ['folgaLateralCm', tr('Folga lateral (por lado)', 'Side clearance (each side)'), 'cm', tr('Espaço entre o corpo e o quadro.', 'Space between body and frame.')],
   ['ajusteAlturaCm', tr('Abaixar o quadro em', 'Lower the frame by'), 'cm', tr('Comece mais baixo e suba aos poucos.', 'Start low and raise it gradually.')],
-  ['extensaoTraseiraMm', tr('Trilho além do eixo', 'Rail past the axle'), 'mm', tr('Do eixo até a barra ou ponteira.', 'From the axle to the crossbar or end cap.')],
+  ['extensaoTraseiraMm', tr('Trilho além do eixo', 'Rail past the axle'), 'mm', tr('Do eixo até a barra ou ponteira. É o mínimo: o projeto aumenta se as peças ou o corpo do cão não couberem.', 'From the axle to the crossbar or end cap. This is a minimum: the design grows it if the parts or the dog’s body do not fit.')],
   ['folgaImpressao', tr('Folga de impressão', 'Print clearance'), 'mm', tr('No diâmetro do encaixe. Calibre com uma peça de teste.', 'On the socket diameter. Calibrate with a test part.')],
   ['paredeConexao', tr('Parede das conexões', 'Connector wall'), 'mm', ''],
   ['profundidade', tr('Profundidade do encaixe', 'Socket depth'), 'mm', tr('Quanto o tubo entra na conexão.', 'How far the tube goes into the connector.')],

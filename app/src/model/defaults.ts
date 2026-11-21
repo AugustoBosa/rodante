@@ -3,7 +3,11 @@
 import type { Ajustes, Materiais, Medidas } from './types'
 
 export const LIMITE_PESO_KG = 40 // acima disso: recomendar fabricante profissional
-export const SEGMENTO_MIN_MM = 20 // tubo mais curto que isso não monta
+export const SEGMENTO_MIN_MM = 20 // tubo visível mínimo entre as bocas de duas conexões (menos que isso não monta)
+// Quanto o corpo passa da articulação na altura do trilho, em fração do ombro → quadril.
+// Medido no modelo 3D do cão (Shiba): a barra traseira fica atrás da garupa e a dianteira à frente do peito.
+export const GARUPA_FRACAO = 0.3
+export const PEITO_FRACAO = 0.17
 export const FOLGA_LATERAL_MIN_CM = 1.5
 export const PVC_PESO_MAX_KG = 12
 export const DIFERENCA_PERNAS_MAX = 0.15 // 4 rodas: acima disso o quadro nivelado fica torto para o cão

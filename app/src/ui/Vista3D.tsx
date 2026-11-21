@@ -1,4 +1,4 @@
-import { forwardRef, Suspense, useEffect, useImperativeHandle, useMemo, useRef, type ReactNode } from 'react'
+import { forwardRef, Suspense, useEffect, useImperativeHandle, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Bounds, Html, Line, OrbitControls } from '@react-three/drei'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
@@ -10,6 +10,8 @@ import { COR, DepoisDoPrimeiroQuadro, Tinta } from './tinta3d'
 import { Cao3D, useCao } from './Cao3D'
 import { movimentoReduzido } from './tela'
 import { COR_CINTA, corPeca } from './coresPecas'
+import { comprimentoClip } from '../model/design'
+import { FITA_L } from '../model/defaults'
 
 function useGeometria(mesh: ShapeMesh) {
   return useMemo(() => {
@@ -117,19 +119,25 @@ function Cinta({ pontos, fechada = false }: { pontos: V3[]; fechada?: boolean })
  * nas rodas não andam. Desenha as cintas da sela (uma por par de clips, por baixo da barriga) e o arnês
  * (peitoral ou de quadril) ligado às ponteiras.
  */
-function CaoNoQuadro({ med, d, tipo, andar }: { med: Medidas; d: Design; tipo: TipoCadeira; andar: boolean }) {
+function CaoNoQuadro({ med, d, tipo, andar, onCorpo }: { med: Medidas; d: Design; tipo: TipoCadeira; andar: boolean; onCorpo: (b: Box3) => void }) {
   const cao = useCao(med, tipo)
   const m = cao.marcos
   const eixo = Math.min(...d.rodas.map((r) => r.pos[0]))
   const ombro = tipo === 'traseira' ? eixo - m.quadril : eixo
   const H = d.cotas.alturaTrilho
+  // caixa do corpo para a câmera enquadrar o cão inteiro
+  useEffect(() => {
+    onCorpo(new Box3(new Vector3(ombro + m.xNariz, -m.largura / 2, 0), new Vector3(ombro + m.xCauda, m.largura / 2, m.altura)))
+  }, [ombro, m, onCorpo])
   const cintas = useMemo(() => {
     const yC = Math.abs(d.juntas.find((j) => j.spec.tipo === 'clipSela')?.pos[1] ?? d.cotas.larguraInterna / 2)
-    const barriga = () => m.barriga - 6 // a cinta encosta por baixo da barriga
+    // a cinta encosta por baixo do corpo: barriga no meio do tronco, prega da coxa atrás, axila na frente
+    const fundo = (x: number) => (x > ombro + m.quadril * 0.8 ? m.virilha : x < ombro + m.quadril * 0.2 ? m.axila : m.barriga) - 6
     const meia = m.largura * 0.36
-    const xs = [...new Set(d.juntas.filter((j) => j.spec.tipo === 'clipSela' && j.pos[1] < 0).map((j) => Math.round(j.pos[0] + 17)))]
+    const meioClip = comprimentoClip({ fitaL: FITA_L }) / 2
+    const xs = [...new Set(d.juntas.filter((j) => j.spec.tipo === 'clipSela' && j.pos[1] < 0).map((j) => Math.round(j.pos[0] + meioClip)))]
     const sela: V3[][] = xs.map((x) => {
-      const z = barriga()
+      const z = fundo(x)
       return [[x, -yC, H], [x, -meia, z + 18], [x, 0, z], [x, meia, z + 18], [x, yC, H]]
     })
     // arnês: anel no peito (ponteiras na frente) ou no quadril (ponteiras atrás), ligado às ponteiras
@@ -226,16 +234,12 @@ export const Vista3D = forwardRef<Vista3DHandle, Props>(function Vista3D(
   useImperativeHandle(ref, () => ({ olhar: (v) => olharRef.current(v) }))
   const c = d.cotas
   const centro = useMemo(() => new Vector3(c.comprimentoTrilho / 2, 0, c.alturaTrilho / 2), [c.comprimentoTrilho, c.alturaTrilho])
-  // caixa do que aparece: quadro + rodas e, com o cão, o corpo dele (proporções do Shiba: focinho ~0,95 L à frente do ombro, cauda ~1,65 L atrás, orelhas ~1,35× costas)
+  const [corpo, setCorpo] = useState<Box3 | null>(null) // medido no modelo do cão quando ele carrega
+  // caixa do que aparece: quadro + rodas e, com o cão, o corpo dele
   const caixa = useMemo(() => {
     const b = new Box3(new Vector3(0, -c.larguraTotal / 2, 0), new Vector3(c.comprimentoTrilho, c.larguraTotal / 2, c.alturaTrilho + tuboD))
     for (const r of d.rodas) b.expandByPoint(new Vector3(r.pos[0] - r.d / 2, 0, 0)).expandByPoint(new Vector3(r.pos[0] + r.d / 2, 0, r.d))
-    if (cao) {
-      const L = cao.comprimentoCm * 10
-      const eixo = Math.min(...d.rodas.map((r) => r.pos[0]))
-      const ombro = tipo === 'traseira' ? eixo - L : eixo
-      b.expandByPoint(new Vector3(ombro - 0.95 * L, 0, cao.alturaCostasCm * 10 * 1.35)).expandByPoint(new Vector3(ombro + 1.65 * L, 0, 0))
-    }
+    if (cao && corpo) b.union(corpo)
     // vista explodida: as peças se afastam do centro (ver posições das juntas abaixo)
     if (explodir > 0) {
       const meio = b.getCenter(new Vector3())
@@ -244,7 +248,7 @@ export const Vista3D = forwardRef<Vista3DHandle, Props>(function Vista3D(
       b.max.sub(meio).multiply(k).add(meio)
     }
     return b
-  }, [d, c, cao, tipo, tuboD, explodir])
+  }, [d, c, cao, corpo, tuboD, explodir])
   const anima = ativo && !movimentoReduzido() && (andar || !!cao || girar)
 
   const yC = Math.abs(d.juntas.find((j) => j.spec.tipo === 'cotovelo' || j.spec.tipo === 'ponteira')?.pos[1] ?? 0)
@@ -277,7 +281,7 @@ export const Vista3D = forwardRef<Vista3DHandle, Props>(function Vista3D(
       ))}
       {cao && (
         <Suspense fallback={null}>
-          <CaoNoQuadro med={cao} d={d} tipo={tipo} andar={anima && andar} />
+          <CaoNoQuadro med={cao} d={d} tipo={tipo} andar={anima && andar} onCorpo={setCorpo} />
         </Suspense>
       )}
       {cotas && (

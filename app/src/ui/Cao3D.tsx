@@ -61,18 +61,20 @@ function medir(cena: Object3D): Ref {
   const z0 = Math.min(...zs)
   const ys = tronco.map((p) => p.y)
   const cy = (Math.min(...ys) + Math.max(...ys)) / 2
-  // axila: entre o ombro e o cotovelo; prega da coxa: entre o quadril e o joelho
-  const entre = (a: string, b: string, t: number) => osso(a).z + (osso(b).z - osso(a).z) * t - z0
+  // fundo do tronco na linha do meio (entre as patas), num trecho de X: axila, barriga, prega da coxa
+  const larg = Math.max(...ys) - Math.min(...ys)
+  const fundo = (de: number, ate: number) =>
+    Math.min(...tronco.filter((p) => Math.abs(p.y - cy) < larg * 0.18 && p.x > ombro.x + comp * de && p.x < ombro.x + comp * ate).map((p) => p.z)) - z0
   const r: Ref = {
     yaw: yaw.rotation.z,
     desloc: [-ombro.x, -cy, -z0],
     comp,
     costas: Math.max(...dorso.map((p) => p.z)) - z0,
-    larg: Math.max(...ys) - Math.min(...ys),
-    axila: entre('FrontShoulder.L', 'FrontLowerLeg.L', 0.75),
-    virilha: entre('BackLeg.L', 'BackUpperLeg.L', 0.8),
+    larg,
+    axila: fundo(0.1, 0.3),
+    virilha: fundo(0.7, 0.9),
     altura: Math.max(...zs) - z0,
-    barriga: Math.min(...tronco.filter((p) => Math.abs(p.y - cy) < (Math.max(...ys) - Math.min(...ys)) * 0.18 && p.x > ombro.x + comp * 0.25 && p.x < quadril.x - comp * 0.2).map((p) => p.z)) - z0,
+    barriga: fundo(0.25, 0.8),
     xMin: Math.min(...xs) - ombro.x,
     xMax: Math.max(...xs) - ombro.x,
     xPataD: osso('FrontLowerLeg.L_end').x - ombro.x,
