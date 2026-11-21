@@ -1,11 +1,11 @@
 # Status e retomada
 
-[← Índice](README.md) · Atualizado em 2026-11-20
+[← Índice](README.md) · Atualizado em 2026-11-21
 
 ## Retomar aqui
 - **Site no ar:** https://augustobosa.github.io/rodante/ · repo público https://github.com/AugustoBosa/rodante (branch `master`; o site é servido da branch `gh-pages`).
-- **Último commit publicado:** `1d6fa64` (rodada 3). Árvore limpa depois dele, exceto este STATUS.
-- **Rodar:** `cd app && npm install && npm run dev`. **Testes:** `npm test` (25). **Lint:** `npm run lint`.
+- **Último commit publicado:** `8444167` (patas por tipo de cadeira, PVC pelo peso, contraste do select), no ar desde 2026-11-21. As pastas `.impeccable/decision|questions|review` ficam fora do git (`.gitignore`).
+- **Rodar:** `cd app && npm install && npm run dev`. **Testes:** `npm test` (26). **Lint:** `npm run lint` (10 avisos antigos, nenhum erro).
 - **Publicar:** push em `master` e depois **disparar o deploy à mão** (o push não dispara, ver Em aberto → Técnico):
   `gh workflow run deploy.yml -R AugustoBosa/rodante --ref master`
 - **Grafo:** `graphify-out/` (local, fora do git). Perguntas sobre o código: `graphify query "<pergunta>"`. O hook `post-commit` atualiza o código sozinho; depois de commitar docs (`wiki/`, `docs/`, `README.md`), rodar `/graphify . --update` com **subagentes Haiku**.
@@ -24,7 +24,9 @@
 6. Abrir o **.zip em inglês** e conferir nomes de arquivo, CSV (`,` e ponto decimal) e README.
 7. Refazer a **impressão da prancha em PDF** (Ctrl+P) depois das mudanças da rodada 3.
 8. **Celular:** conferido só em emulação (390 px). Falta testar num celular real, em especial o 3D do cão (peso ~0,85 MB do modelo + WebGL).
-8b. **Rótulos 3D em modo dev:** com StrictMode, o primeiro rótulo `<Html>` do drei às vezes some e o console mostra "synchronously unmount a root". No build de produção não acontece (sem StrictMode).
+8a. **Animação das patas na tela:** a regra (traseira anda só com as da frente, dianteira só com as de trás, 4 rodas sem patas) foi conferida por script nos nomes das trilhas do modelo, mas não vista na tela depois do `8444167`. Conferir na capa trocando A → B → C.
+8b. **Projeto → projeto pelo endereço:** trocar `#/projeto/A` para `#/projeto/B` direto na barra mostra o projeto anterior até recarregar. Pela lista "Meus projetos" funciona. Bug antigo, não corrigido.
+8c. **Rótulos 3D em modo dev:** com StrictMode, o primeiro rótulo `<Html>` do drei às vezes some e o console mostra "synchronously unmount a root". No build de produção não acontece (sem StrictMode).
 
 ### Técnico
 9. **Push em `master` não dispara o workflow** `deploy.yml` (0 execuções por push desde a criação do repo; Actions habilitado, workflow ativo, 0 webhooks). Causa não encontrada. Contorno: `gh workflow run` depois do push.
@@ -51,6 +53,8 @@
 - **Cores das peças (pedido do usuário):** cada tipo de peça impressa tem uma cor (`app/src/ui/coresPecas.ts`), igual no 3D, inventário, lista e miniaturas; azul continua só para destaque/ação. Traço fino (1–1,6 px).
 - **Cão na cadeira:** escala pela perna que define o trilho (trilho logo abaixo da barriga); patas apoiadas nas rodas não andam (trilhas da animação removidas). Cintas da sela, arnês e ligações desenhadas em 3D; fita e velcro calculados em `cintas()` (`model/bom.ts`, comprimentos estimados).
 - **Espaçamento das peças:** cada conexão ocupa `recuo + profundidade` do tubo (`alcance()` em `design.ts`); entre duas bocas sobra ≥ 20 mm de tubo visível e os clips da sela ficam no tubo livre, um de cada lado da perna do cão. A diagonal de 45° só entra quando cabe; cão baixo sai sem ela, com aviso. O trilho além do eixo é no mínimo o que cabe as peças e deixa a barra atrás da garupa ou à frente do peito.
+- **PVC pelo peso** (`pvcPeloPeso()` em `design.ts`): até 12 kg livre; 12–15 kg permitido com aviso; acima de 15 kg bloqueado no wizard (card tracejado, troca para alumínio) e na prancha (opção desabilitada, erro que bloqueia o .zip).
+- **Animação do cão:** mixer próprio em `Cao3D.tsx` (o `useAnimations` da drei reaproveitava a ação antiga ao trocar o tipo de cadeira); a cada troca o esqueleto volta à pose de repouso.
 - **Cão na escala certa:** a escala na cadeira vem da prega da coxa (traseira) ou da axila (dianteira), lidas no fundo do tronco do modelo, não nos ossos da perna. Patas: na traseira as de trás ficam paradas e as da frente andam; na dianteira, o contrário (confirmado com o usuário).
 - **Cão:** Shiba Inu 3D de Quaternius (CC0) em `app/public/modelos/shiba.glb`; reserva 2D com silhueta CC0 (Margot Michaud, PhyloPic). Créditos em `app/public/modelos/LICENCAS.txt` e no rodapé.
 
@@ -76,5 +80,6 @@
 - **2026-11-20, F0–F1:** setup e spike CAD (cotovelo Replicad → STL).
 - **2026-11-20, F2–F7:** app completo (modelo, peças, wizard, prancha, saídas, deploy). Lighthouse 100.
 - **2026-11-20, publicação:** repo público + GitHub Pages pela branch `gh-pages`.
+- **2026-11-21, rodada 5:** cão dentro da cadeira (escala pela prega da coxa/axila, barras fora do corpo), peças espaçadas pelo alcance do encaixe, diagonal só quando cabe, patas por tipo de cadeira, PVC pelo peso, contraste do select.
 - **2026-11-20, rodada 4:** nova UI/UX do zero (skill impeccable): tela cheia no PC, celular revisto, cão 3D nas medidas e na prancha, vitrine animada.
 - **2026-11-20, rodada 3:** dianteira e 4 rodas, STEP por peça e do conjunto, vista explodida, miniaturas, carregamento animado, inglês, favicon próprio, grafo graphify (Haiku) com hook de commit.
