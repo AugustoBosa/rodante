@@ -11,7 +11,7 @@ import { bom, cortes, csv, montagem } from '../model/bom'
 import { LIMITES, PVC_PESO_LIMITE_KG } from '../model/defaults'
 import type { Ajustes, Design, Materiais, Medidas, Projeto, TipoCadeira } from '../model/types'
 import { RACAS, nomeRaca } from '../data/racas'
-import { tr } from '../i18n'
+import { formatoNumero, tr } from '../i18n'
 import { obter, paraLink, salvar } from '../store'
 import { baixar, DICA_IMPRESSAO, linhasCortes, nomeStl, pacoteZip, slug } from '../saidas'
 
@@ -231,7 +231,7 @@ function PranchaProjeto({ p, setP }: { p: Projeto; setP: (f: (x: Projeto) => Pro
                 <select id="p-tubo" value={p.materiais.tubo} onChange={(e) => setMat({ tubo: e.target.value as Materiais['tubo'] })}>
                   <option value="aluminio">{tr('Alumínio', 'Aluminum')}</option>
                   <option value="pvc" disabled={pvcPeloPeso(p.cao.pesoKg) === 'bloqueado'}>
-                    {pvcPeloPeso(p.cao.pesoKg) === 'bloqueado' ? tr(`PVC (só até ~${PVC_PESO_LIMITE_KG} kg)`, `PVC (only up to ~${PVC_PESO_LIMITE_KG} kg)`) : 'PVC'}
+                    {pvcPeloPeso(p.cao.pesoKg) === 'bloqueado' ? tr('PVC (só até ~{PVC_PESO_LIMITE_KG} kg)', 'PVC (only up to ~{PVC_PESO_LIMITE_KG} kg)', { PVC_PESO_LIMITE_KG }) : 'PVC'}
                   </option>
                 </select>
               </div>
@@ -299,7 +299,7 @@ function PranchaProjeto({ p, setP }: { p: Projeto; setP: (f: (x: Projeto) => Pro
             detalhe={
               carga < 1
                 ? `${Math.round(carga * 100)}% · ${tr('só na primeira vez, depois fica guardado no navegador', 'first time only, then it stays cached in the browser')}`
-                : tr(`${feitas} de ${d.pecas.length} peças`, `${feitas} of ${d.pecas.length} parts`)
+                : tr('{feitas} de {length} peças', '{feitas} of {length} parts', { feitas, length: d.pecas.length })
             }
           />
         )}
@@ -396,7 +396,7 @@ function PranchaProjeto({ p, setP }: { p: Projeto; setP: (f: (x: Projeto) => Pro
                         <br />
                         <span className="mudo">{l.especificacao}{l.obs ? ` · ${l.obs}` : ''}</span>
                       </td>
-                      <td className="num">{String(l.qtd).replace('.', ',')} {l.un}</td>
+                      <td className="num">{formatoNumero(l.qtd)} {l.un}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -411,7 +411,7 @@ function PranchaProjeto({ p, setP }: { p: Projeto; setP: (f: (x: Projeto) => Pro
 
             <div className="aba" role="tabpanel" id="painel-cortes" aria-labelledby="aba-cortes" hidden={aba !== 'cortes'}>
               <h2>{tr('Cortes de tubo', 'Tube cuts')}</h2>
-              <p className="mudo">{tr(`Medidas de ponta a ponta do tubo, já descontado o que entra nas conexões. Tubo Ø ${p.materiais.tuboD} mm.`, `Tube end-to-end lengths, with the part that goes into the connectors already taken off. Tube Ø ${p.materiais.tuboD} mm.`)}</p>
+              <p className="mudo">{tr('Medidas de ponta a ponta do tubo, já descontado o que entra nas conexões. Tubo Ø {tuboD} mm.', 'Tube end-to-end lengths, with the part that goes into the connectors already taken off. Tube Ø {tuboD} mm.', { tuboD: p.materiais.tuboD })}</p>
               <table>
                 <thead>
                   <tr>

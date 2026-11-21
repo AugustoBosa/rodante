@@ -7,7 +7,7 @@ import type { QualMedida } from './Ilustracao'
 import { Cao3D, useCao, type Marcos } from './Cao3D'
 import { COR, DepoisDoPrimeiroQuadro } from './tinta3d'
 import { movimentoReduzido } from './tela'
-import { tr } from '../i18n'
+import { formatoNumero, tr } from '../i18n'
 
 const CAMPO: Record<QualMedida, keyof Medidas> = {
   alturaPerna: 'alturaPernaCm',
@@ -115,7 +115,7 @@ function Cena({ med, foco }: { med: Medidas; foco: QualMedida }) {
       <directionalLight position={[-800, -1500, 2200]} intensity={1.7} />
       <Cao3D cao={cao} anim={foco === 'largura' ? 'Idle' : 'Idle_2'} />
       {!cima && <Line points={[[m.xNariz - 160, 0, 0], [m.xCauda + 160, 0, 0]]} color={COR.tinta} lineWidth={2} />}
-      <Fita key={foco} de={fita.de} ate={fita.ate} n={fita.n} texto={`${valor > 0 ? String(valor).replace('.', ',') : '?'} cm · ${ROTULO[foco]}`} />
+      <Fita key={foco} de={fita.de} ate={fita.ate} n={fita.n} texto={`${valor > 0 ? formatoNumero(valor) : '?'} cm · ${ROTULO[foco]}`} />
     </>
   )
 }

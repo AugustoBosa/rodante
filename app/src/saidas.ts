@@ -2,7 +2,7 @@ import { strToU8, zipSync } from 'fflate'
 import type { Design, PecaLista, Projeto } from './model/types'
 import { bom, cortes, csv, montagem } from './model/bom'
 import { TIPOS } from './model/design'
-import { idioma, tr } from './i18n'
+import { dataHoraLocal, idioma, tr } from './i18n'
 
 export function baixar(nome: string, dados: Blob | string, tipo = 'text/plain;charset=utf-8') {
   const blob = typeof dados === 'string' ? new Blob([dados], { type: tipo }) : dados
@@ -20,7 +20,7 @@ export const nomeStl = (pc: PecaLista) => `${slug(pc.nome)}_x${pc.qtd}.stl`
 
 export const linhasCortes = (d: Design): Record<string, string | number>[] =>
   cortes(d).map((c): Record<string, string | number> =>
-    idioma === 'en' ? { part: c.nome, length_mm: c.comprimento, qty: c.qtd } : { peca: c.nome, comprimento_mm: c.comprimento, qtd: c.qtd },
+    idioma !== 'pt' ? { part: c.nome, length_mm: c.comprimento, qty: c.qtd } : { peca: c.nome, comprimento_mm: c.comprimento, qtd: c.qtd },
   )
 
 export const DICA_IMPRESSAO: Record<PecaLista['spec']['tipo'], string> = {
@@ -43,8 +43,8 @@ function leiaMe(p: Projeto, d: Design): string {
   const md = p.medidas
   const tipo = TIPOS.find((t) => t.id === p.tipo)!.nome.toLowerCase()
   return [
-    tr(`RODANTE — cadeira de rodas (${tipo}) para ${p.cao.nome} (${p.cao.pesoKg} kg)`, `RODANTE — dog wheelchair (${tipo}) for ${p.cao.nome} (${p.cao.pesoKg} kg)`),
-    tr(`Gerado em ${new Date().toLocaleString('pt-BR')}`, `Generated on ${new Date().toLocaleString('en-US')}`),
+    tr('RODANTE — cadeira de rodas ({tipo}) para {nome} ({pesoKg} kg)', 'RODANTE — dog wheelchair ({tipo}) for {nome} ({pesoKg} kg)', { tipo, nome: p.cao.nome, pesoKg: p.cao.pesoKg }),
+    tr('Gerado em {data}', 'Generated on {data}', { data: dataHoraLocal(new Date()) }),
     '',
     tr(
       'AVISO: avaliação de veterinário ou fisioterapeuta é obrigatória antes do uso. Projeto caseiro, sem teste de laboratório.',
@@ -53,14 +53,14 @@ function leiaMe(p: Projeto, d: Design): string {
     '',
     tr('MEDIDAS DO CÃO (cm, deitado de lado)', 'DOG MEASUREMENTS (cm, lying on its side)'),
     tr(
-      `  perna traseira ${md.alturaPernaCm || '—'} · perna dianteira ${md.alturaPernaDianteiraCm || '—'} · comprimento ${md.comprimentoCm} · largura ${md.larguraCm} · costas ${md.alturaCostasCm}`,
-      `  hind leg ${md.alturaPernaCm || '—'} · front leg ${md.alturaPernaDianteiraCm || '—'} · length ${md.comprimentoCm} · width ${md.larguraCm} · back ${md.alturaCostasCm}`,
+      '  perna traseira {v} · perna dianteira {v2} · comprimento {comprimentoCm} · largura {larguraCm} · costas {alturaCostasCm}',
+      '  hind leg {v} · front leg {v2} · length {comprimentoCm} · width {larguraCm} · back {alturaCostasCm}', { v: md.alturaPernaCm || '—', v2: md.alturaPernaDianteiraCm || '—', comprimentoCm: md.comprimentoCm, larguraCm: md.larguraCm, alturaCostasCm: md.alturaCostasCm },
     ),
     '',
     tr('COTAS DO QUADRO (mm)', 'FRAME DIMENSIONS (mm)'),
     tr(
-      `  altura do trilho ${c.alturaTrilho} · comprimento ${c.comprimentoTrilho} · largura interna ${c.larguraInterna} · largura total ${c.larguraTotal} · altura do eixo ${c.alturaEixo}`,
-      `  rail height ${c.alturaTrilho} · length ${c.comprimentoTrilho} · inner width ${c.larguraInterna} · overall width ${c.larguraTotal} · axle height ${c.alturaEixo}`,
+      '  altura do trilho {alturaTrilho} · comprimento {comprimentoTrilho} · largura interna {larguraInterna} · largura total {larguraTotal} · altura do eixo {alturaEixo}',
+      '  rail height {alturaTrilho} · length {comprimentoTrilho} · inner width {larguraInterna} · overall width {larguraTotal} · axle height {alturaEixo}', { alturaTrilho: c.alturaTrilho, comprimentoTrilho: c.comprimentoTrilho, larguraInterna: c.larguraInterna, larguraTotal: c.larguraTotal, alturaEixo: c.alturaEixo },
     ),
     '',
     tr('ALERTAS', 'ALERTS'),
@@ -73,8 +73,8 @@ function leiaMe(p: Projeto, d: Design): string {
     ...montagem(p, d).map((m, i) => `  ${i + 1}. ${m}`),
     '',
     tr(
-      `Arquivos: stl/ (para imprimir), step/ (para CAD, inclui o conjunto montado), ${ARQ.bom}, ${ARQ.cortes}, projeto.json (reabra em "Meus projetos" > Importar).`,
-      `Files: stl/ (to print), step/ (for CAD, includes the full assembly), ${ARQ.bom}, ${ARQ.cortes}, projeto.json (reopen it in "My projects" > Import).`,
+      'Arquivos: stl/ (para imprimir), step/ (para CAD, inclui o conjunto montado), {bom}, {cortes}, projeto.json (reabra em "Meus projetos" > Importar).',
+      'Files: stl/ (to print), step/ (for CAD, includes the full assembly), {bom}, {cortes}, projeto.json (reopen it in "My projects" > Import).', { bom: ARQ.bom, cortes: ARQ.cortes },
     ),
   ].join('\r\n')
 }

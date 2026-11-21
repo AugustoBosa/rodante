@@ -28,7 +28,7 @@ export function usePecas(d: Design | null, ligar = true) {
         cad
           .peca(pc.spec)
           .then((r) => vivo && setPecas((x) => ({ ...x, [pc.chave]: r })))
-          .catch((e) => vivo && setErro(tr(`Falha ao gerar ${pc.nome}: ${e}`, `Failed to generate ${pc.nome}: ${e}`)))
+          .catch((e) => vivo && setErro(tr('Falha ao gerar {nome}: {e}', 'Failed to generate {nome}: {e}', { nome: pc.nome, e })))
     }, 300)
     return () => {
       vivo = false

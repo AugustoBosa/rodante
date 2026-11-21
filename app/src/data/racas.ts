@@ -11,7 +11,7 @@ export interface Raca {
 
 import { tr } from '../i18n'
 
-const AKC = 'AKC breed standard (aprox.)'
+const AKC = tr('Padrão de raça AKC (aprox.)', 'AKC breed standard (approx.)')
 
 export const RACAS: Raca[] = [
   { id: 'srd', nome: 'SRD (vira-lata)', en: 'Mixed breed', fonte: '—' },

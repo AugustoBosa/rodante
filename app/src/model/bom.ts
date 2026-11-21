@@ -1,6 +1,6 @@
 import type { Design, Projeto } from './types'
 import { raioExterno } from './design'
-import { idioma, tr } from '../i18n'
+import { formatoNumero, separadorCsv, tr } from '../i18n'
 
 export interface LinhaBom {
   item: string
@@ -22,7 +22,7 @@ export function bom(p: Projeto, d: Design): LinhaBom[] {
   const linhas: LinhaBom[] = [
     {
       item: m.tubo === 'aluminio' ? tr('Tubo de alumínio', 'Aluminum tube') : tr('Tubo de PVC', 'PVC pipe'),
-      especificacao: tr(`Ø ${m.tuboD} mm, parede ${m.tuboParede} mm`, `Ø ${m.tuboD} mm, wall ${m.tuboParede} mm`),
+      especificacao: tr('Ø {tuboD} mm, parede {tuboParede} mm', 'Ø {tuboD} mm, wall {tuboParede} mm', { tuboD: m.tuboD, tuboParede: m.tuboParede }),
       qtd: Math.ceil((totalTubo * PERDA_CORTE) / 10) / 100,
       un: 'm',
       obs: tr('Inclui 10% de perda. Cortes na aba Cortes', 'Includes 10% waste. See the Cuts tab'),
@@ -36,14 +36,14 @@ export function bom(p: Projeto, d: Design): LinhaBom[] {
     })),
     {
       item: tr('Roda', 'Wheel'),
-      especificacao: tr(`Ø ${m.rodaD} mm, largura ${m.rodaLargura} mm, furo para eixo ${m.eixoD} mm`, `Ø ${m.rodaD} mm, width ${m.rodaLargura} mm, ${m.eixoD} mm axle bore`),
+      especificacao: tr('Ø {rodaD} mm, largura {rodaLargura} mm, furo para eixo {eixoD} mm', 'Ø {rodaD} mm, width {rodaLargura} mm, {eixoD} mm axle bore', { rodaD: m.rodaD, rodaLargura: m.rodaLargura, eixoD: m.eixoD }),
       qtd: rodas,
       un,
       obs: tr('Com rolamento ou bucha', 'With bearing or bushing'),
     },
     {
       item: tr('Parafuso-eixo', 'Axle bolt'),
-      especificacao: tr(`M${m.eixoD}, comprimento ≥ ${Math.ceil(2 * ro + m.rodaLargura + 15)} mm, sextavado`, `M${m.eixoD}, length ≥ ${Math.ceil(2 * ro + m.rodaLargura + 15)} mm, hex head`),
+      especificacao: tr('M{eixoD}, comprimento ≥ {v} mm, sextavado', 'M{eixoD}, length ≥ {v} mm, hex head', { eixoD: m.eixoD, v: Math.ceil(2 * ro + m.rodaLargura + 15) }),
       qtd: rodas,
       un,
       obs: tr('Parte lisa onde gira a roda', 'Smooth shank where the wheel turns'),
@@ -64,16 +64,23 @@ export function bom(p: Projeto, d: Design): LinhaBom[] {
       qtd: c.fitaM,
       un: 'm',
       obs: tr(
-        `${c.sela} cinta(s) de sela de ~${Math.round(c.selaMm / 10)} cm${c.ligacoes ? ` + ${c.ligacoes} ligação(ões) ao arnês de ~${Math.round(c.ligacaoMm / 10)} cm` : ''}, com 10% de sobra (estimativa)`,
-        `${c.sela} saddle strap(s) of ~${Math.round(c.selaMm / 10)} cm${c.ligacoes ? ` + ${c.ligacoes} harness link(s) of ~${Math.round(c.ligacaoMm / 10)} cm` : ''}, with 10% spare (estimate)`,
+        '{sela} cinta(s) de sela de ~{selaCm} cm{extra}, com 10% de sobra (estimativa)',
+        '{sela} saddle strap(s) of ~{selaCm} cm{extra}, with 10% spare (estimate)',
+        {
+          sela: c.sela,
+          selaCm: Math.round(c.selaMm / 10),
+          extra: c.ligacoes
+            ? tr(' + {n} ligação(ões) ao arnês de ~{cm} cm', ' + {n} harness link(s) of ~{cm} cm', { n: c.ligacoes, cm: Math.round(c.ligacaoMm / 10) })
+            : '',
+        },
       ),
     },
     { item: tr('Velcro (ou fivela) para a cinta', 'Velcro (or buckle) for the strap'), especificacao: tr('25 mm, ~10 cm por cinta', '25 mm, ~10 cm per strap'), qtd: c.sela + c.ligacoes, un, obs: tr('Fecha cada cinta e permite ajustar', 'Closes each strap and allows adjusting') },
     { item: tr('Espuma ou neoprene', 'Foam or neoprene'), especificacao: tr('5 mm, para forrar a sela', '5 mm, to pad the saddle'), qtd: 1, un, obs: '~30 × 20 cm' },
     p.tipo === 'traseira'
-      ? { item: tr('Peitoral (arnês)', 'Chest harness'), especificacao: tr(`para cão de ${p.cao.pesoKg} kg`, `for a ${p.cao.pesoKg} kg dog`), qtd: 1, un, obs: tr('Comercial; prende nas ponteiras', 'Off the shelf; ties to the end caps') }
+      ? { item: tr('Peitoral (arnês)', 'Chest harness'), especificacao: tr('para cão de {pesoKg} kg', 'for a {pesoKg} kg dog', { pesoKg: p.cao.pesoKg }), qtd: 1, un, obs: tr('Comercial; prende nas ponteiras', 'Off the shelf; ties to the end caps') }
       : p.tipo === 'dianteira'
-        ? { item: tr('Arnês de quadril', 'Hip harness'), especificacao: tr(`para cão de ${p.cao.pesoKg} kg`, `for a ${p.cao.pesoKg} kg dog`), qtd: 1, un, obs: tr('Prende nas ponteiras de trás', 'Ties to the rear end caps') }
+        ? { item: tr('Arnês de quadril', 'Hip harness'), especificacao: tr('para cão de {pesoKg} kg', 'for a {pesoKg} kg dog', { pesoKg: p.cao.pesoKg }), qtd: 1, un, obs: tr('Prende nas ponteiras de trás', 'Ties to the rear end caps') }
         : { item: tr('Sela de corpo inteiro', 'Full-body sling'), especificacao: tr('Tecido resistente com alças', 'Sturdy fabric with straps'), qtd: 1, un, obs: tr('Apoia peito e barriga; presa nos clips', 'Supports chest and belly; hangs from the clips') },
   )
   return linhas
@@ -124,8 +131,8 @@ export function montagem(p: Projeto, d: Design): string[] {
     tr('Corte os tubos conforme a aba Cortes. Lixe as rebarbas e confira cada medida.', 'Cut the tubes as listed in the Cuts tab. Deburr and check every length.'),
     tr('Monte cada lateral seguindo a ordem do trilho (Trilho 1, 2, 3…), com os tês nas posições do modelo 3D.', 'Build each side following the rail order (Rail 1, 2, 3…), with the tees where the 3D model shows them.'),
     tr(
-      `Em cada eixo${eixos > 1 ? ' (frente e trás)' : ''}: tê 90° → perna superior → tê 45° → perna inferior → suporte do eixo. Feche o triângulo com a diagonal.`,
-      `At each axle${eixos > 1 ? ' (front and rear)' : ''}: 90° tee → upper leg → 45° tee → lower leg → axle mount. Close the triangle with the brace.`,
+      'Em cada eixo{v}: tê 90° → perna superior → tê 45° → perna inferior → suporte do eixo. Feche o triângulo com a diagonal.',
+      'At each axle{v}: 90° tee → upper leg → 45° tee → lower leg → axle mount. Close the triangle with the brace.', { v: eixos > 1 ? tr(' (frente e trás)', ' (front and rear)') : '' },
     ),
     duasBarras ? tr('Una as duas laterais com as barras da frente e de trás.', 'Join both sides with the front and rear crossbars.') : tr('Una as duas laterais com a barra.', 'Join both sides with the crossbar.'),
     tr('Fure os tubos pelos furos das conexões e trave com parafuso e porca autotravante.', 'Drill the tubes through the connector holes and lock with bolt and lock nut.'),
@@ -136,8 +143,8 @@ export function montagem(p: Projeto, d: Design): string[] {
         : tr('Encaixe as ponteiras e prenda nelas o peitoral com a fita.', 'Fit the end caps and tie the chest harness to them with webbing.')
       : tr('Prenda a sela de corpo inteiro nos clips, com alças sob o peito e a barriga.', 'Hang the full-body sling from the clips, with straps under chest and belly.'),
     tr(
-      `Prenda os clips da sela no trilho e passe a fita forrada por baixo do corpo. Altura do trilho: ${d.cotas.alturaTrilho} mm do chão.`,
-      `Snap the saddle clips onto the rail and run the padded webbing under the body. Rail height: ${d.cotas.alturaTrilho} mm from the ground.`,
+      'Prenda os clips da sela no trilho e passe a fita forrada por baixo do corpo. Altura do trilho: {alturaTrilho} mm do chão.',
+      'Snap the saddle clips onto the rail and run the padded webbing under the body. Rail height: {alturaTrilho} mm from the ground.', { alturaTrilho: d.cotas.alturaTrilho },
     ),
     tr('Coloque o cão com ajuda de outra pessoa. Confira: patas tocam o chão, nada raspa, coluna reta.', 'Put the dog in with a helper. Check: paws touch the ground, nothing rubs, spine is straight.'),
   ]
@@ -146,10 +153,10 @@ export function montagem(p: Projeto, d: Design): string[] {
 export function csv(linhas: Record<string, string | number>[]): string {
   if (!linhas.length) return ''
   // pt-BR: ';' e vírgula decimal (Excel brasileiro); en: ',' e ponto
-  const sep = idioma === 'en' ? ',' : ';'
+  const sep = separadorCsv
   const cab = Object.keys(linhas[0])
   const cel = (v: string | number) => {
-    const s = typeof v === 'number' ? (idioma === 'en' ? String(v) : String(v).replace('.', ',')) : v
+    const s = typeof v === 'number' ? formatoNumero(v) : v
     return new RegExp(`[${sep}"\\n]`).test(s) ? `"${s.replace(/"/g, '""')}"` : s
   }
   return '﻿' + [cab.join(sep), ...linhas.map((l) => cab.map((c) => cel(l[c])).join(sep))].join('\r\n')

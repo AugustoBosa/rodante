@@ -36,7 +36,7 @@ export function Projetos() {
     }
     setMsg(
       n
-        ? tr(`${n} projeto(s) importado(s).`, `${n} project(s) imported.`)
+        ? tr('{n} projeto(s) importado(s).', '{n} project(s) imported.', { n })
         : tr('Nenhum projeto válido nos arquivos escolhidos. Use o .json exportado pelo Rodante.', 'No valid project in the chosen files. Use the .json exported by Rodante.'),
     )
     atualizar()
@@ -116,9 +116,9 @@ export function Projetos() {
                   </button>
                   <button
                     className="btn btn-pequeno btn-perigo"
-                    aria-label={tr(`Excluir o projeto de ${p.cao.nome}`, `Delete the project for ${p.cao.nome}`)}
+                    aria-label={tr('Excluir o projeto de {nome}', 'Delete the project for {nome}', { nome: p.cao.nome })}
                     onClick={() => {
-                      if (confirm(tr(`Excluir o projeto de ${p.cao.nome}? Não dá para desfazer.`, `Delete the project for ${p.cao.nome}? This cannot be undone.`))) {
+                      if (confirm(tr('Excluir o projeto de {nome}? Não dá para desfazer.', 'Delete the project for {nome}? This cannot be undone.', { nome: p.cao.nome }))) {
                         excluir(p.id)
                         atualizar()
                       }

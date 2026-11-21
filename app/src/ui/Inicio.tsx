@@ -3,7 +3,7 @@ import { ArrowRight, Check, Dog, Printer, Ruler, Stethoscope, Users, X } from 'l
 import { Miniatura } from './Miniatura'
 import { gravarRascunho, lerRascunho } from '../store'
 import { ir } from '../rota'
-import { tr } from '../i18n'
+import { formatoNumero, tr } from '../i18n'
 import { computeDesign, LETRA_TIPO, TIPOS } from '../model/design'
 import { comprados, cortes, montagem } from '../model/bom'
 import type { TipoCadeira } from '../model/types'
@@ -144,8 +144,8 @@ export function Inicio() {
           <h2 id="inv-titulo">{tr('Tudo o que entra na cadeira, contado.', 'Everything that goes into the cart, counted.')}</h2>
           <p>
             {tr(
-              `Peças e cortes reais da cadeira ${TIPOS.find((t) => t.id === tipo)!.nome.toLowerCase()} do cão de exemplo. Com as medidas do seu cão, tudo muda de tamanho.`,
-              `Real parts and cuts of the example dog's ${TIPOS.find((t) => t.id === tipo)!.nome.toLowerCase()} cart. With your dog's measurements, everything resizes.`,
+              'Peças e cortes reais da cadeira {v} do cão de exemplo. Com as medidas do seu cão, tudo muda de tamanho.',
+              `Real parts and cuts of the example dog's {v} cart. With your dog's measurements, everything resizes.`, { v: TIPOS.find((t) => t.id === tipo)!.nome.toLowerCase() },
             )}
           </p>
         </header>
@@ -169,7 +169,7 @@ export function Inicio() {
         <ul className="comprados">
           {comprados(p, d).map((l) => (
             <li key={l.item}>
-              <b>{l.un === 'm' ? `${String(l.qtd).replace('.', tr(',', '.'))} m` : `×${l.qtd}`}</b>
+              <b>{l.un === 'm' ? `${formatoNumero(l.qtd)} m` : `×${l.qtd}`}</b>
               <span>
                 <strong>{l.item}</strong>
                 <small>{l.especificacao}</small>
@@ -195,7 +195,7 @@ export function Inicio() {
 
       <section className="montagem-rolagem" ref={secaoMontagem} aria-labelledby="mont-titulo">
         <div className="palco" ref={palcoMontagem}>
-          <h2 className="titulo-palco" id="mont-titulo">{tr(`Monte em ${passos.length} passos`, `Build it in ${passos.length} steps`)}</h2>
+          <h2 className="titulo-palco" id="mont-titulo">{tr('Monte em {length} passos', 'Build it in {length} steps', { length: passos.length })}</h2>
           {tem3D ? (
             <Suspense fallback={null}>
               <PalcoProjeto p={p} ligarCad={cadLigado} explodir={explodir} cao={passoAtivo === passos.length - 1} ativo={montagemVisivel} folga={1.2} />

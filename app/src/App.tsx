@@ -4,10 +4,20 @@ import { Wizard } from './ui/Wizard'
 import { Projetos } from './ui/Projetos'
 import { Carregando } from './ui/Carregando'
 import { deLink, importar, obter } from './store'
-import { idioma, tr, trocarIdioma } from './i18n'
+import { SeletorIdioma } from './ui/SeletorIdioma'
+import { bcp47, tr } from './i18n'
 
-document.documentElement.lang = idioma === 'en' ? 'en' : 'pt-BR'
+document.documentElement.lang = bcp47
 document.title = tr('Rodante — cadeira de rodas sob medida para cães', 'Rodante — custom-fit dog wheelchairs')
+document
+  .querySelector('meta[name="description"]')
+  ?.setAttribute(
+    'content',
+    tr(
+      'Informe as medidas do seu cão e receba o projeto da cadeira de rodas: modelo 3D, lista de materiais, cortes de tubo e peças para imprimir.',
+      "Enter your dog's measurements and get the wheelchair design: 3D model, bill of materials, tube cuts and parts to print.",
+    ),
+  )
 
 // three.js e o motor CAD só carregam quando a prancha abre
 const Prancha = lazy(() => import('./ui/Prancha'))
@@ -88,9 +98,7 @@ export default function App() {
             <span className="rotulo-longo">{tr('Meus projetos', 'My projects')}</span>
             <span aria-hidden="true" className="rotulo-curto">{tr('Projetos', 'Projects')}</span>
           </a>
-          <button className="idioma" onClick={() => trocarIdioma(idioma === 'en' ? 'pt' : 'en')} lang={idioma === 'en' ? 'pt-BR' : 'en'}>
-            {idioma === 'en' ? 'Português' : 'English'}
-          </button>
+          <SeletorIdioma />
         </nav>
       </header>
       <main ref={main} tabIndex={-1}>{pagina}</main>

@@ -4,8 +4,8 @@
 
 ## Retomar aqui
 - **Site no ar:** https://augustobosa.github.io/rodante/ · repo público https://github.com/AugustoBosa/rodante (branch `master`; o site é servido da branch `gh-pages`).
-- **Último commit publicado:** `8444167` (patas por tipo de cadeira, PVC pelo peso, contraste do select), no ar desde 2026-11-21. As pastas `.impeccable/decision|questions|review` ficam fora do git (`.gitignore`).
-- **Rodar:** `cd app && npm install && npm run dev`. **Testes:** `npm test` (26). **Lint:** `npm run lint` (10 avisos antigos, nenhum erro).
+- **Último commit publicado:** `8444167` no ar (patas por tipo de cadeira, PVC pelo peso). Depois dele: **6 idiomas** (pt, en, es, fr, de, it) com detecção automática, fallback em inglês e seletor com bandeiras; catálogos em `app/src/locales/` (tradução por IA, falta revisão nativa). Para somar idioma: arquivo em `locales/`, import e linha em `IDIOMAS` (`i18n.ts`), bandeira em `SeletorIdioma.tsx`; `npm run i18n:faltando` lista o que falta. As pastas `.impeccable/decision|questions|review` ficam fora do git (`.gitignore`).
+- **Rodar:** `cd app && npm install && npm run dev`. **Testes:** `npm test` (29). **Lint:** `npm run lint` (10 avisos antigos, nenhum erro).
 - **Publicar:** push em `master` e depois **disparar o deploy à mão** (o push não dispara, ver Em aberto → Técnico):
   `gh workflow run deploy.yml -R AugustoBosa/rodante --ref master`
 - **Grafo:** `graphify-out/` (local, fora do git). Perguntas sobre o código: `graphify query "<pergunta>"`. O hook `post-commit` atualiza o código sozinho; depois de commitar docs (`wiki/`, `docs/`, `README.md`), rodar `/graphify . --update` com **subagentes Haiku**.

@@ -62,7 +62,7 @@ export function Miniatura({ p }: { p: Projeto }) {
   }, [p])
 
   return (
-    <svg viewBox={vb.join(' ')} className="miniatura" role="img" aria-label={tr(`Desenho do quadro de ${p.cao.nome || 'exemplo'}`, `Frame drawing for ${p.cao.nome || 'example'}`)}>
+    <svg viewBox={vb.join(' ')} className="miniatura" role="img" aria-label={tr('Desenho do quadro de {nome}', 'Frame drawing for {nome}', { nome: p.cao.nome || tr('exemplo', 'example') })}>
       {itens.map((i) => i.el)}
     </svg>
   )

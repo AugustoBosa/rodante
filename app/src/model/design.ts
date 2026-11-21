@@ -64,7 +64,7 @@ export function nomePeca(s: SpecPeca): string {
 export function validarCampo(campo: keyof typeof LIMITES, v: number): string | null {
   const [min, max] = LIMITES[campo]
   if (!Number.isFinite(v) || (v === 0 && min > 0)) return tr('Preencha este campo', 'Fill in this field')
-  if (v < min || v > max) return tr(`Entre ${min} e ${max}`, `Between ${min} and ${max}`)
+  if (v < min || v > max) return tr('Entre {min} e {max}', 'Between {min} and {max}', { min, max })
   return null
 }
 
@@ -220,46 +220,46 @@ export function computeDesign(p: Projeto): Design {
       nivel: 'erro',
       texto: ((lista) =>
         tr(
-          `Não cabe: ${lista || 'perna'} fica curto demais. Use roda menor (hoje Ø ${m.rodaD} mm) ou confira a altura da perna.`,
-          `Does not fit: ${lista || 'leg'} is too short. Use a smaller wheel (now Ø ${m.rodaD} mm) or check the leg height.`,
+          'Não cabe: {lista} fica curto demais. Use roda menor (hoje Ø {rodaD} mm) ou confira a altura da perna.',
+          'Does not fit: {lista} is too short. Use a smaller wheel (now Ø {rodaD} mm) or check the leg height.', { lista: lista || tr('perna', 'leg'), rodaD: m.rodaD },
         ))([...new Set([...curtos.map((t) => t.replace(/ \([^)]*\)$/, '').toLowerCase()), ...(semLugarClip ? [tr('trilho', 'rail')] : [])])].join(', ')),
     })
   else if (!temDiagonal)
     alertas.push({
       nivel: 'aviso',
       texto: tr(
-        `Quadro baixo para a diagonal de reforço: sai sem ela e fica menos rígido. Uma roda menor (hoje Ø ${m.rodaD} mm) devolve a diagonal.`,
-        `Frame too low for the 45° brace: it is left out and the frame is less rigid. A smaller wheel (now Ø ${m.rodaD} mm) brings the brace back.`,
+        'Quadro baixo para a diagonal de reforço: sai sem ela e fica menos rígido. Uma roda menor (hoje Ø {rodaD} mm) devolve a diagonal.',
+        'Frame too low for the 45° brace: it is left out and the frame is less rigid. A smaller wheel (now Ø {rodaD} mm) brings the brace back.', { rodaD: m.rodaD },
       ),
     })
   if (cao.pesoKg > LIMITE_PESO_KG)
-    alertas.push({ nivel: 'erro', texto: tr(`Peso acima de ${LIMITE_PESO_KG} kg: este projeto caseiro não é indicado. Procure um fabricante profissional.`, `Weight above ${LIMITE_PESO_KG} kg: this home-made design is not suitable. Look for a professional manufacturer.`) })
+    alertas.push({ nivel: 'erro', texto: tr('Peso acima de {LIMITE_PESO_KG} kg: este projeto caseiro não é indicado. Procure um fabricante profissional.', 'Weight above {LIMITE_PESO_KG} kg: this home-made design is not suitable. Look for a professional manufacturer.', { LIMITE_PESO_KG }) })
   const tMin = tuboMinimo(cao.pesoKg)
   if (m.tubo === 'aluminio' && m.tuboD < tMin)
-    alertas.push({ nivel: 'aviso', texto: tr(`Tubo fino para ${cao.pesoKg} kg: use Ø ≥ ${tMin} mm (estimativa sem teste de carga).`, `Tube too thin for ${cao.pesoKg} kg: use Ø ≥ ${tMin} mm (estimate, no load test).`) })
+    alertas.push({ nivel: 'aviso', texto: tr('Tubo fino para {pesoKg} kg: use Ø ≥ {tMin} mm (estimativa sem teste de carga).', 'Tube too thin for {pesoKg} kg: use Ø ≥ {tMin} mm (estimate, no load test).', { pesoKg: cao.pesoKg, tMin }) })
   const pvc = pvcPeloPeso(cao.pesoKg)
   if (m.tubo === 'pvc' && pvc === 'bloqueado')
-    alertas.push({ nivel: 'erro', texto: tr(`PVC não aguenta ${cao.pesoKg} kg (vai até ~${PVC_PESO_LIMITE_KG} kg). Use alumínio.`, `PVC cannot carry ${cao.pesoKg} kg (up to ~${PVC_PESO_LIMITE_KG} kg). Use aluminum.`) })
+    alertas.push({ nivel: 'erro', texto: tr('PVC não aguenta {pesoKg} kg (vai até ~{PVC_PESO_LIMITE_KG} kg). Use alumínio.', 'PVC cannot carry {pesoKg} kg (up to ~{PVC_PESO_LIMITE_KG} kg). Use aluminum.', { pesoKg: cao.pesoKg, PVC_PESO_LIMITE_KG }) })
   else if (m.tubo === 'pvc' && pvc === 'aviso')
-    alertas.push({ nivel: 'aviso', texto: tr(`PVC é indicado até ~${PVC_PESO_MAX_KG} kg e o cão tem ${cao.pesoKg} kg. Dá para usar, mas confira se o quadro não verga; alumínio é mais seguro.`, `PVC is meant for up to ~${PVC_PESO_MAX_KG} kg and the dog weighs ${cao.pesoKg} kg. It can work, but check that the frame does not bend; aluminum is safer.`) })
+    alertas.push({ nivel: 'aviso', texto: tr('PVC é indicado até ~{PVC_PESO_MAX_KG} kg e o cão tem {pesoKg} kg. Dá para usar, mas confira se o quadro não verga; alumínio é mais seguro.', 'PVC is meant for up to ~{PVC_PESO_MAX_KG} kg and the dog weighs {pesoKg} kg. It can work, but check that the frame does not bend; aluminum is safer.', { PVC_PESO_MAX_KG, pesoKg: cao.pesoKg }) })
   if (aj.folgaLateralCm < FOLGA_LATERAL_MIN_CM)
-    alertas.push({ nivel: 'aviso', texto: tr(`Folga lateral de ${aj.folgaLateralCm} cm pode raspar no corpo. Recomendado ≥ ${FOLGA_LATERAL_MIN_CM} cm.`, `Side clearance of ${aj.folgaLateralCm} cm may rub the body. Recommended ≥ ${FOLGA_LATERAL_MIN_CM} cm.`) })
+    alertas.push({ nivel: 'aviso', texto: tr('Folga lateral de {folgaLateralCm} cm pode raspar no corpo. Recomendado ≥ {FOLGA_LATERAL_MIN_CM} cm.', 'Side clearance of {folgaLateralCm} cm may rub the body. Recommended ≥ {FOLGA_LATERAL_MIN_CM} cm.', { folgaLateralCm: aj.folgaLateralCm, FOLGA_LATERAL_MIN_CM }) })
   if (md.alturaCostasCm > 0 && H + ro > md.alturaCostasCm * 10)
     alertas.push({ nivel: 'aviso', texto: tr('O trilho fica acima da linha das costas. Confira a altura da perna e a altura das costas.', 'The rail sits above the back line. Check the leg height and the back height.') })
   if (p.tipo === 'quatro' && Math.abs(pernaT - pernaD) > DIFERENCA_PERNAS_MAX * Math.max(pernaT, pernaD))
-    alertas.push({ nivel: 'aviso', texto: tr(`Pernas da frente (${pernaD} cm) e de trás (${pernaT} cm) muito diferentes: o quadro fica na altura da mais curta. Confira as medidas.`, `Front legs (${pernaD} cm) and hind legs (${pernaT} cm) differ a lot: the frame follows the shorter one. Check the measurements.`) })
+    alertas.push({ nivel: 'aviso', texto: tr('Pernas da frente ({pernaD} cm) e de trás ({pernaT} cm) muito diferentes: o quadro fica na altura da mais curta. Confira as medidas.', 'Front legs ({pernaD} cm) and hind legs ({pernaT} cm) differ a lot: the frame follows the shorter one. Check the measurements.', { pernaD, pernaT }) })
   if (p.tipo === 'dianteira')
     alertas.push({ nivel: 'aviso', texto: tr('Cadeira dianteira só funciona se as patas traseiras sustentam o corpo. Confirme com o veterinário.', 'A front cart only works if the hind legs bear the body. Confirm with the vet.') })
   if (p.tipo === 'quatro')
     alertas.push({ nivel: 'aviso', texto: tr('Cadeira de 4 rodas pesa mais e cansa mais. Use só se o veterinário indicar fraqueza nas quatro patas.', 'A 4-wheel cart is heavier and more tiring. Use it only if the vet finds weakness in all four legs.') })
   const raca = RACAS.find((r) => r.id === cao.raca)
   if (raca?.pesoKg && (cao.pesoKg < raca.pesoKg[0] * 0.7 || cao.pesoKg > raca.pesoKg[1] * 1.3))
-    alertas.push({ nivel: 'aviso', texto: tr(`Peso fora do comum para ${nomeRaca(raca)} (${raca.pesoKg[0]}–${raca.pesoKg[1]} kg). Confira.`, `Unusual weight for ${nomeRaca(raca)} (${raca.pesoKg[0]}–${raca.pesoKg[1]} kg). Please check.`) })
+    alertas.push({ nivel: 'aviso', texto: tr('Peso fora do comum para {nomeRaca} ({pesoKg0}–{pesoKg1} kg). Confira.', 'Unusual weight for {nomeRaca} ({pesoKg0}–{pesoKg1} kg). Please check.', { nomeRaca: nomeRaca(raca), pesoKg0: raca.pesoKg[0], pesoKg1: raca.pesoKg[1] }) })
   if (raca?.alturaCm && (md.alturaCostasCm < raca.alturaCm[0] * 0.75 || md.alturaCostasCm > raca.alturaCm[1] * 1.25))
-    alertas.push({ nivel: 'aviso', texto: tr(`Altura das costas fora do comum para ${nomeRaca(raca)} (${raca.alturaCm[0]}–${raca.alturaCm[1]} cm). Confira a medida.`, `Unusual back height for ${nomeRaca(raca)} (${raca.alturaCm[0]}–${raca.alturaCm[1]} cm). Check the measurement.`) })
+    alertas.push({ nivel: 'aviso', texto: tr('Altura das costas fora do comum para {nomeRaca} ({alturaCm0}–{alturaCm1} cm). Confira a medida.', 'Unusual back height for {nomeRaca} ({alturaCm0}–{alturaCm1} cm). Check the measurement.', { nomeRaca: nomeRaca(raca), alturaCm0: raca.alturaCm[0], alturaCm1: raca.alturaCm[1] }) })
   alertas.push(
     { nivel: 'info', texto: tr('Avaliação de veterinário ou fisioterapeuta é obrigatória antes do uso.', 'A vet or physiotherapist assessment is required before use.') },
-    { nivel: 'info', texto: tr(`Comece com o quadro mais baixo: ${PATAS[p.tipo]} devem tocar o chão. Ajuste aos poucos.`, `Start with the frame low: ${PATAS[p.tipo]} must touch the ground. Adjust gradually.`) },
+    { nivel: 'info', texto: tr('Comece com o quadro mais baixo: {v} devem tocar o chão. Ajuste aos poucos.', 'Start with the frame low: {v} must touch the ground. Adjust gradually.', { v: PATAS[p.tipo] }) },
     { nivel: 'info', texto: tr('Use porca autotravante (ou trava química) no eixo e nos parafusos. Inspecione toda semana.', 'Use lock nuts (or threadlocker) on the axle and bolts. Inspect every week.') },
     { nivel: 'info', texto: tr('Primeiros usos curtos (5–10 min) e sempre supervisionados.', 'Keep first sessions short (5–10 min) and always supervised.') },
   )

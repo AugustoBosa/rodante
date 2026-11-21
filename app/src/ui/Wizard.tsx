@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, OctagonAlert, Stethoscope, TriangleAlert, Users 
 import { Campo } from './Campo'
 import { Ilustracao, type QualMedida } from './Ilustracao'
 import { RACAS, nomeRaca } from '../data/racas'
-import { tr } from '../i18n'
+import { formatoNumero, tr } from '../i18n'
 import { AJUSTES_PADRAO, LIMITE_PESO_KG, MATERIAIS_PADRAO, MEDIDAS_VAZIAS, PVC_PESO_LIMITE_KG, PVC_PESO_MAX_KG, tuboMinimo } from '../model/defaults'
 import { LETRA_TIPO, medidasDoTipo, pvcPeloPeso, TIPOS, validarCampo } from '../model/design'
 import type { Cao, Materiais, Medidas, Projeto, TipoCadeira } from '../model/types'
@@ -187,7 +187,7 @@ export function Wizard() {
               <span className="n" aria-hidden="true">{r.passo + 1}</span>
               <div>
                 <h1 ref={titulo} tabIndex={-1}>
-                  <span className="visualmente-oculto">{tr(`Passo ${r.passo + 1} de ${PASSOS.length}: `, `Step ${r.passo + 1} of ${PASSOS.length}: `)}</span>
+                  <span className="visualmente-oculto">{tr('Passo {v} de {length}: ', 'Step {v} of {length}: ', { v: r.passo + 1, length: PASSOS.length })}</span>
                   {[
                     tr('Quem vai usar a cadeira?', 'Who will use the cart?'),
                     tr('Que tipo de cadeira?', 'Which type of cart?'),
@@ -233,7 +233,7 @@ export function Wizard() {
                       setR((x) => ({ ...x, cao: { ...x.cao, pesoKg }, materiais: x.materiais.tubo === 'pvc' && pvcPeloPeso(pesoKg) === 'bloqueado' ? { ...x.materiais, tubo: 'aluminio' } : x.materiais }))
                     }
                     erro={err('pesoKg')}
-                    ajuda={raca?.pesoKg ? tr(`Comum para ${nomeRaca(raca)}: ${raca.pesoKg[0]}–${raca.pesoKg[1]} kg`, `Typical for ${nomeRaca(raca)}: ${raca.pesoKg[0]}–${raca.pesoKg[1]} kg`) : undefined}
+                    ajuda={raca?.pesoKg ? tr('Comum para {nomeRaca}: {pesoKg0}–{pesoKg1} kg', 'Typical for {nomeRaca}: {pesoKg0}–{pesoKg1} kg', { nomeRaca: nomeRaca(raca), pesoKg0: raca.pesoKg[0], pesoKg1: raca.pesoKg[1] }) : undefined}
                   />
                 </div>
                 {r.cao.pesoKg > LIMITE_PESO_KG && (
@@ -241,8 +241,8 @@ export function Wizard() {
                     <OctagonAlert className="ico" aria-hidden="true" />
                     <span>
                       {tr(
-                        `Acima de ${LIMITE_PESO_KG} kg o projeto caseiro não é indicado. Você pode continuar para estudar, mas procure um fabricante profissional.`,
-                        `Above ${LIMITE_PESO_KG} kg a home-made cart is not recommended. You can continue to study it, but look for a professional manufacturer.`,
+                        'Acima de {LIMITE_PESO_KG} kg o projeto caseiro não é indicado. Você pode continuar para estudar, mas procure um fabricante profissional.',
+                        'Above {LIMITE_PESO_KG} kg a home-made cart is not recommended. You can continue to study it, but look for a professional manufacturer.', { LIMITE_PESO_KG },
                       )}
                     </span>
                   </p>
@@ -280,7 +280,7 @@ export function Wizard() {
                         vazioSeZero
                         onChange={(v) => set('medidas', { [m.k]: v })}
                         erro={err(m.k)}
-                        ajuda={m.como + (m.k === 'alturaCostasCm' && raca?.alturaCm ? tr(` Comum para ${nomeRaca(raca)}: ${raca.alturaCm[0]}–${raca.alturaCm[1]} cm.`, ` Typical for ${nomeRaca(raca)}: ${raca.alturaCm[0]}–${raca.alturaCm[1]} cm.`) : '')}
+                        ajuda={m.como + (m.k === 'alturaCostasCm' && raca?.alturaCm ? tr(' Comum para {nomeRaca}: {alturaCm0}–{alturaCm1} cm.', ' Typical for {nomeRaca}: {alturaCm0}–{alturaCm1} cm.', { nomeRaca: nomeRaca(raca), alturaCm0: raca.alturaCm[0], alturaCm1: raca.alturaCm[1] }) : '')}
                       />
                     </div>
                   ))}
@@ -302,13 +302,13 @@ export function Wizard() {
                           {t === 'aluminio'
                             ? tr('Leve e resistente. Indicado para a maioria dos cães.', 'Light and strong. Suits most dogs.')
                             : pvc === 'bloqueado'
-                              ? tr(`Indisponível para ${r.cao.pesoKg} kg: o PVC vai até ~${PVC_PESO_LIMITE_KG} kg. Use alumínio.`, `Not available for ${r.cao.pesoKg} kg: PVC goes up to ~${PVC_PESO_LIMITE_KG} kg. Use aluminum.`)
-                              : tr(`Barato e fácil de achar. Só para cães leves, até ~${PVC_PESO_MAX_KG} kg.`, `Cheap and easy to find. Only for light dogs, up to ~${PVC_PESO_MAX_KG} kg.`)}
+                              ? tr('Indisponível para {pesoKg} kg: o PVC vai até ~{PVC_PESO_LIMITE_KG} kg. Use alumínio.', 'Not available for {pesoKg} kg: PVC goes up to ~{PVC_PESO_LIMITE_KG} kg. Use aluminum.', { pesoKg: r.cao.pesoKg, PVC_PESO_LIMITE_KG })
+                              : tr('Barato e fácil de achar. Só para cães leves, até ~{PVC_PESO_MAX_KG} kg.', 'Cheap and easy to find. Only for light dogs, up to ~{PVC_PESO_MAX_KG} kg.', { PVC_PESO_MAX_KG })}
                         </span>
                         {pvc === 'aviso' && (
                           <span className="opcao-aviso">
                             <TriangleAlert size={16} aria-hidden />
-                            {tr(`${r.cao.pesoKg} kg é um pouco acima do indicado. Dá para usar, mas o quadro pode vergar.`, `${r.cao.pesoKg} kg is a bit above the limit. It can work, but the frame may bend.`)}
+                            {tr('{pesoKg} kg é um pouco acima do indicado. Dá para usar, mas o quadro pode vergar.', '{pesoKg} kg is a bit above the limit. It can work, but the frame may bend.', { pesoKg: r.cao.pesoKg })}
                           </span>
                         )}
                       </label>
@@ -324,12 +324,12 @@ export function Wizard() {
                       valor={r.materiais.tuboD}
                       onChange={(tuboD) => set('materiais', { tuboD })}
                       erro={err('tuboD')}
-                      ajuda={tr(`Recomendado para ${r.cao.pesoKg || '?'} kg: ≥ ${tuboMinimo(r.cao.pesoKg)} mm. Meça com paquímetro.`, `Recommended for ${r.cao.pesoKg || '?'} kg: ≥ ${tuboMinimo(r.cao.pesoKg)} mm. Measure with calipers.`)}
+                      ajuda={tr('Recomendado para {v} kg: ≥ {tuboMinimo} mm. Meça com paquímetro.', 'Recommended for {v} kg: ≥ {tuboMinimo} mm. Measure with calipers.', { v: r.cao.pesoKg || '?', tuboMinimo: tuboMinimo(r.cao.pesoKg) })}
                     />
                     <div className="tubos-comuns" role="group" aria-label={tr('Diâmetros comuns', 'Common diameters')}>
                       {TUBOS_COMUNS.map((d) => (
                         <button key={d} type="button" className="btn btn-pequeno" aria-pressed={r.materiais.tuboD === d} onClick={() => set('materiais', { tuboD: d })}>
-                          {String(d).replace('.', tr(',', '.'))}
+                          {formatoNumero(d)}
                         </button>
                       ))}
                     </div>
