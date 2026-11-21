@@ -9,7 +9,8 @@ export const SEGMENTO_MIN_MM = 20 // tubo visível mínimo entre as bocas de dua
 export const GARUPA_FRACAO = 0.3
 export const PEITO_FRACAO = 0.17
 export const FOLGA_LATERAL_MIN_CM = 1.5
-export const PVC_PESO_MAX_KG = 12
+export const PVC_PESO_MAX_KG = 12 // indicado para PVC
+export const PVC_PESO_LIMITE_KG = 15 // até aqui o PVC ainda é permitido, com aviso; acima, bloqueado
 export const DIFERENCA_PERNAS_MAX = 0.15 // 4 rodas: acima disso o quadro nivelado fica torto para o cão
 
 // ponytail: tabela heurística peso → Ø mínimo de tubo de alumínio; trocar por teste de carga

@@ -17,7 +17,7 @@
 1. **Calibrar `folgaImpressao`** (hoje 0,4 mm, chute) em `app/src/model/defaults.ts`: imprimir um tê, testar no tubo real e anotar a folga que encaixa firme.
 2. **Montar uma cadeira de teste.** Dianteira e 4 rodas nunca foram montadas: geometria testada só em código e na tela.
 3. **Resistência das peças:** nenhuma conexão teve teste de carga. O clip da sela em PETG pode trincar ao encaixar (TPU é alternativa).
-4. **Valores padrão sem fonte** (todos em `defaults.ts`): Ø do tubo por faixa de peso, folga lateral 3 cm, limite 40 kg, PVC até 12 kg, diferença máxima de 15% entre pernas (4 rodas), abaixar o quadro 2 cm, garupa 0,30 e peito 0,17 do comprimento (medidos só no modelo 3D do Shiba). Validar com montagem real e, se possível, fisioterapeuta veterinário.
+4. **Valores padrão sem fonte** (todos em `defaults.ts`): Ø do tubo por faixa de peso, folga lateral 3 cm, limite 40 kg, PVC indicado até 12 kg e bloqueado acima de 15 kg (entre os dois, só com aviso), diferença máxima de 15% entre pernas (4 rodas), abaixar o quadro 2 cm, garupa 0,30 e peito 0,17 do comprimento (medidos só no modelo 3D do Shiba). Validar com montagem real e, se possível, fisioterapeuta veterinário.
 
 ### Não verificado (fazer quando der)
 5. Abrir o **STEP do conjunto** num CAD (FreeCAD/Fusion) e conferir a posição das peças. Hoje só sabemos que o arquivo é gerado (a rotação das peças tem teste unitário em `pecas.test.ts`).

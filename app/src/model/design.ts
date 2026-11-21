@@ -9,6 +9,7 @@ import {
   LIMITE_PESO_KG,
   LIMITES,
   PEITO_FRACAO,
+  PVC_PESO_LIMITE_KG,
   PVC_PESO_MAX_KG,
   SEGMENTO_MIN_MM,
   tuboMinimo,
@@ -35,6 +36,10 @@ export function recuo(s: SpecPeca): number {
   const meio = (anguloMinimo(s) / 2) * (Math.PI / 180)
   return (meio >= Math.PI / 2 - 1e-9 ? 0 : raioInterno(s) / Math.tan(meio)) + BATENTE
 }
+
+/** PVC pelo peso do cão: até o indicado, livre; um pouco acima, permitido com aviso; bem acima, bloqueado. */
+export const pvcPeloPeso = (pesoKg: number): 'ok' | 'aviso' | 'bloqueado' =>
+  pesoKg > PVC_PESO_LIMITE_KG ? 'bloqueado' : pesoKg > PVC_PESO_MAX_KG ? 'aviso' : 'ok'
 
 /** Até onde a conexão ocupa o tubo, a partir do centro: recuo + boca do encaixe. Duas conexões no mesmo tubo não podem se cruzar. */
 export function alcance(s: SpecPeca): number {
@@ -232,8 +237,11 @@ export function computeDesign(p: Projeto): Design {
   const tMin = tuboMinimo(cao.pesoKg)
   if (m.tubo === 'aluminio' && m.tuboD < tMin)
     alertas.push({ nivel: 'aviso', texto: tr(`Tubo fino para ${cao.pesoKg} kg: use Ø ≥ ${tMin} mm (estimativa sem teste de carga).`, `Tube too thin for ${cao.pesoKg} kg: use Ø ≥ ${tMin} mm (estimate, no load test).`) })
-  if (m.tubo === 'pvc' && cao.pesoKg > PVC_PESO_MAX_KG)
-    alertas.push({ nivel: 'aviso', texto: tr(`PVC é indicado só até ~${PVC_PESO_MAX_KG} kg. Para ${cao.pesoKg} kg prefira alumínio.`, `PVC is only suitable up to ~${PVC_PESO_MAX_KG} kg. For ${cao.pesoKg} kg use aluminum.`) })
+  const pvc = pvcPeloPeso(cao.pesoKg)
+  if (m.tubo === 'pvc' && pvc === 'bloqueado')
+    alertas.push({ nivel: 'erro', texto: tr(`PVC não aguenta ${cao.pesoKg} kg (vai até ~${PVC_PESO_LIMITE_KG} kg). Use alumínio.`, `PVC cannot carry ${cao.pesoKg} kg (up to ~${PVC_PESO_LIMITE_KG} kg). Use aluminum.`) })
+  else if (m.tubo === 'pvc' && pvc === 'aviso')
+    alertas.push({ nivel: 'aviso', texto: tr(`PVC é indicado até ~${PVC_PESO_MAX_KG} kg e o cão tem ${cao.pesoKg} kg. Dá para usar, mas confira se o quadro não verga; alumínio é mais seguro.`, `PVC is meant for up to ~${PVC_PESO_MAX_KG} kg and the dog weighs ${cao.pesoKg} kg. It can work, but check that the frame does not bend; aluminum is safer.`) })
   if (aj.folgaLateralCm < FOLGA_LATERAL_MIN_CM)
     alertas.push({ nivel: 'aviso', texto: tr(`Folga lateral de ${aj.folgaLateralCm} cm pode raspar no corpo. Recomendado ≥ ${FOLGA_LATERAL_MIN_CM} cm.`, `Side clearance of ${aj.folgaLateralCm} cm may rub the body. Recommended ≥ ${FOLGA_LATERAL_MIN_CM} cm.`) })
   if (md.alturaCostasCm > 0 && H + ro > md.alturaCostasCm * 10)

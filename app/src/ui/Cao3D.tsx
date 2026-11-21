@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from 'react'
-import { useAnimations, useGLTF } from '@react-three/drei'
+import { useGLTF } from '@react-three/drei'
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js'
 import { useFrame } from '@react-three/fiber'
-import { BackSide, Group, MeshBasicMaterial, SkinnedMesh, Vector2, Vector3, type AnimationClip, type Object3D } from 'three'
+import { AnimationMixer, BackSide, Group, MeshBasicMaterial, SkinnedMesh, Vector2, Vector3, type AnimationClip, type Bone, type Object3D, type Quaternion } from 'three'
 import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import type { Medidas, TipoCadeira } from '../model/types'
 import { COR } from './tinta3d'
@@ -180,7 +180,11 @@ export function useCao(med: Partial<Medidas>, apoio?: TipoCadeira) {
     const ref = medir(cena)
     const tela = { value: new Vector2(1000, 1000) } // tamanho do canvas em px, atualizado a cada quadro
     for (const m of corpos) m.add(contorno(m, tela))
-    return { cena, ref, tela }
+    // pose de repouso dos ossos: as patas tiradas da animação voltam para ela (não congelam no meio do passo)
+    const ossos: [Object3D, Vector3, Quaternion, Vector3][] = []
+    cena.traverse((o) => void ((o as Bone).isBone && ossos.push([o, o.position.clone(), o.quaternion.clone(), o.scale.clone()])))
+    const repousar = () => ossos.forEach(([o, p, q, s]) => (o.position.copy(p), o.quaternion.copy(q), o.scale.copy(s)))
+    return { cena, ref, tela, repousar }
   }, [scene])
   const { alturaCostasCm, alturaPernaCm, alturaPernaDianteiraCm, comprimentoCm, larguraCm } = med
   const m = useMemo(
@@ -194,7 +198,10 @@ export function useCao(med: Partial<Medidas>, apoio?: TipoCadeira) {
 const PATAS_TRAS = /^(BackShoulder|BackLeg|BackUpperLeg|BackLowerLeg|IKBackLeg|FFB|PoleTargetBack)/
 const PATAS_FRENTE = /^(FrontShoulder|FrontUpperLeg|FrontLowerLeg|IKFrontLeg|FF(?!B)|PoleTarget(?!Back))/
 
-/** Na cadeira, as patas apoiadas nas rodas ficam paradas: tira as trilhas delas da animação. */
+/**
+ * Na cadeira, as patas apoiadas nas rodas ficam paradas: tira as trilhas delas da animação.
+ * Traseira: andam só as da frente. Dianteira: só as de trás. Quatro rodas: nenhuma.
+ */
 function semPatas(clips: AnimationClip[], parado?: TipoCadeira): AnimationClip[] {
   if (!parado) return clips
   const fora = (n: string) => (parado !== 'dianteira' && PATAS_TRAS.test(n)) || (parado !== 'traseira' && PATAS_FRENTE.test(n))
@@ -209,15 +216,23 @@ export type CaoCarregado = ReturnType<typeof useCao>
 
 /** Desenha o cão: origem no ombro, chão em z=0, cabeça para -X. */
 export function Cao3D({ cao, anim = 'Idle', parado }: { cao: CaoCarregado; anim?: 'Idle' | 'Walk' | 'Idle_2'; parado?: TipoCadeira }) {
-  const clips = useMemo(() => semPatas(cao.animations, parado), [cao.animations, parado])
-  const { actions } = useAnimations(clips, cao.cena)
+  // mixer próprio: o useAnimations da drei reaproveita a ação antiga quando os clips mudam,
+  // e o cão ficava com as patas do primeiro tipo de cadeira ao trocar de tipo
+  const mixer = useMemo(() => new AnimationMixer(cao.cena), [cao.cena])
   useEffect(() => {
-    if (movimentoReduzido()) return
-    const a = actions[anim]
-    a?.reset().fadeIn(0.4).play()
-    return () => void a?.fadeOut(0.4)
-  }, [actions, anim])
-  useFrame(({ size }) => cao.tela.value.set(size.width, size.height))
+    cao.repousar()
+    const clip = semPatas(cao.animations, parado).find((c) => c.name === anim)
+    if (!clip || movimentoReduzido()) return
+    const a = mixer.clipAction(clip).fadeIn(0.4).play()
+    return () => {
+      a.stop()
+      mixer.uncacheClip(clip)
+    }
+  }, [cao, mixer, parado, anim])
+  useFrame(({ size }, dt) => {
+    mixer.update(dt)
+    cao.tela.value.set(size.width, size.height)
+  })
   const { ref, marcos: m } = cao
   return (
     <group scale={m.esc}>

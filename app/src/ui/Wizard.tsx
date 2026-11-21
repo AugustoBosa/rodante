@@ -1,11 +1,11 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowLeft, ArrowRight, OctagonAlert, Stethoscope, Users } from 'lucide-react'
+import { ArrowLeft, ArrowRight, OctagonAlert, Stethoscope, TriangleAlert, Users } from 'lucide-react'
 import { Campo } from './Campo'
 import { Ilustracao, type QualMedida } from './Ilustracao'
 import { RACAS, nomeRaca } from '../data/racas'
 import { tr } from '../i18n'
-import { AJUSTES_PADRAO, LIMITE_PESO_KG, MATERIAIS_PADRAO, MEDIDAS_VAZIAS, tuboMinimo } from '../model/defaults'
-import { LETRA_TIPO, medidasDoTipo, TIPOS, validarCampo } from '../model/design'
+import { AJUSTES_PADRAO, LIMITE_PESO_KG, MATERIAIS_PADRAO, MEDIDAS_VAZIAS, PVC_PESO_LIMITE_KG, PVC_PESO_MAX_KG, tuboMinimo } from '../model/defaults'
+import { LETRA_TIPO, medidasDoTipo, pvcPeloPeso, TIPOS, validarCampo } from '../model/design'
 import type { Cao, Materiais, Medidas, Projeto, TipoCadeira } from '../model/types'
 import { gravarRascunho, lerRascunho, limparRascunho, novoId, salvar } from '../store'
 import { ir } from '../rota'
@@ -57,12 +57,15 @@ const SUBTITULO = [
 
 function inicial(): Rascunho {
   const r = lerRascunho() as Partial<Rascunho> | null
+  const cao = { nome: '', raca: '', pesoKg: 0, ...r?.cao }
+  const materiais = { ...MATERIAIS_PADRAO, ...r?.materiais }
+  if (materiais.tubo === 'pvc' && pvcPeloPeso(cao.pesoKg) === 'bloqueado') materiais.tubo = 'aluminio'
   return {
     passo: r?.passo ?? 0,
     tipo: r?.tipo ?? 'traseira',
-    cao: { nome: '', raca: '', pesoKg: 0, ...r?.cao },
+    cao,
     medidas: { ...MEDIDAS_VAZIAS, ...r?.medidas },
-    materiais: { ...MATERIAIS_PADRAO, ...r?.materiais },
+    materiais,
     avisoVet: r?.avisoVet ?? false,
   }
 }
@@ -225,7 +228,10 @@ export function Wizard() {
                     unidade="kg"
                     valor={r.cao.pesoKg}
                     vazioSeZero
-                    onChange={(pesoKg) => set('cao', { pesoKg })}
+                    onChange={(pesoKg) =>
+                      // peso alto demais para PVC: troca para alumínio (a opção fica bloqueada no passo dos materiais)
+                      setR((x) => ({ ...x, cao: { ...x.cao, pesoKg }, materiais: x.materiais.tubo === 'pvc' && pvcPeloPeso(pesoKg) === 'bloqueado' ? { ...x.materiais, tubo: 'aluminio' } : x.materiais }))
+                    }
                     erro={err('pesoKg')}
                     ajuda={raca?.pesoKg ? tr(`Comum para ${nomeRaca(raca)}: ${raca.pesoKg[0]}–${raca.pesoKg[1]} kg`, `Typical for ${nomeRaca(raca)}: ${raca.pesoKg[0]}–${raca.pesoKg[1]} kg`) : undefined}
                   />
@@ -286,17 +292,28 @@ export function Wizard() {
               <>
                 <fieldset className="opcoes" style={{ marginBottom: 22 }}>
                   <legend className="rotulo" style={{ fontWeight: 700, marginBottom: 8, padding: 0 }}>{tr('Tubo do quadro', 'Frame tube')}</legend>
-                  {(['aluminio', 'pvc'] as const).map((t) => (
-                    <label key={t} className="opcao">
-                      <input type="radio" name="tubo" checked={r.materiais.tubo === t} onChange={() => set('materiais', { tubo: t })} />
-                      <h3>{t === 'aluminio' ? tr('Alumínio', 'Aluminum') : 'PVC'}</h3>
-                      <span className="mudo">
-                        {t === 'aluminio'
-                          ? tr('Leve e resistente. Indicado para a maioria dos cães.', 'Light and strong. Suits most dogs.')
-                          : tr('Barato e fácil de achar. Só para cães leves, até ~12 kg.', 'Cheap and easy to find. Only for light dogs, up to ~12 kg.')}
-                      </span>
-                    </label>
-                  ))}
+                  {(['aluminio', 'pvc'] as const).map((t) => {
+                    const pvc = t === 'pvc' ? pvcPeloPeso(r.cao.pesoKg) : 'ok'
+                    return (
+                      <label key={t} className="opcao">
+                        <input type="radio" name="tubo" disabled={pvc === 'bloqueado'} checked={r.materiais.tubo === t} onChange={() => set('materiais', { tubo: t })} />
+                        <h3>{t === 'aluminio' ? tr('Alumínio', 'Aluminum') : 'PVC'}</h3>
+                        <span className="mudo">
+                          {t === 'aluminio'
+                            ? tr('Leve e resistente. Indicado para a maioria dos cães.', 'Light and strong. Suits most dogs.')
+                            : pvc === 'bloqueado'
+                              ? tr(`Indisponível para ${r.cao.pesoKg} kg: o PVC vai até ~${PVC_PESO_LIMITE_KG} kg. Use alumínio.`, `Not available for ${r.cao.pesoKg} kg: PVC goes up to ~${PVC_PESO_LIMITE_KG} kg. Use aluminum.`)
+                              : tr(`Barato e fácil de achar. Só para cães leves, até ~${PVC_PESO_MAX_KG} kg.`, `Cheap and easy to find. Only for light dogs, up to ~${PVC_PESO_MAX_KG} kg.`)}
+                        </span>
+                        {pvc === 'aviso' && (
+                          <span className="opcao-aviso">
+                            <TriangleAlert size={16} aria-hidden />
+                            {tr(`${r.cao.pesoKg} kg é um pouco acima do indicado. Dá para usar, mas o quadro pode vergar.`, `${r.cao.pesoKg} kg is a bit above the limit. It can work, but the frame may bend.`)}
+                          </span>
+                        )}
+                      </label>
+                    )
+                  })}
                 </fieldset>
                 <div className="grade-campos">
                   <div>

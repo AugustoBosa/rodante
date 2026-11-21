@@ -128,6 +128,8 @@ main:focus { outline: none; }
   font: 600 1.15rem var(--fonte); font-variant-numeric: tabular-nums; padding: 11px 12px; outline: none;
 }
 .entrada select { font-weight: 500; font-size: 1.05rem; }
+/* lista aberta do select: sem isto o navegador usa fundo branco com o texto claro do tema escuro */
+select option { background: var(--papel); color: var(--tinta); }
 .entrada .un { display: grid; place-items: center; min-width: 52px; padding: 0 10px; font-weight: 700; color: var(--tinta-2); border-left: var(--traco) solid var(--tinta); background: var(--papel-2); }
 .campo[data-erro='true'] .entrada { border-color: var(--erro); box-shadow: 0 0 0 3px var(--erro-claro); }
 .campo[data-ativo='true'] .entrada { border-color: var(--azul); }
@@ -147,6 +149,11 @@ main:focus { outline: none; }
 .opcao:hover { background: var(--papel-2); }
 .opcao:has(input:focus-visible) { outline: 3px solid var(--azul); outline-offset: 3px; }
 .opcao input { position: absolute; opacity: 0; }
+.opcao:has(input:disabled) { cursor: not-allowed; border-style: dashed; color: var(--tinta-2); }
+.opcao:has(input:disabled):hover { background: var(--papel); }
+.opcao:has(input:disabled)::before { border-color: var(--cinza-3); background: var(--papel-2); }
+.opcao .opcao-aviso { display: flex; gap: 6px; align-items: flex-start; margin-top: 6px; color: var(--aviso); font-weight: 700; font-size: 0.9rem; }
+.opcao .opcao-aviso svg { flex: none; margin-top: 2px; }
 .opcao h3 { margin: 0; font-size: 1.1rem; }
 .opcao .letra { position: absolute; right: 14px; top: 10px; font-weight: 900; font-stretch: 62%; font-size: 2rem; line-height: 1; color: var(--cinza-3); }
 

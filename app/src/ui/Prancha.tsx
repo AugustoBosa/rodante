@@ -6,9 +6,9 @@ import { MiniPeca, Vista3D, type Vista, type Vista3DHandle } from './Vista3D'
 import { usePecas } from './usePecas'
 import { corPeca } from './coresPecas'
 import { cad } from '../cad/cliente'
-import { computeDesign, medidasDoTipo, TIPOS, validarCampo } from '../model/design'
+import { computeDesign, medidasDoTipo, pvcPeloPeso, TIPOS, validarCampo } from '../model/design'
 import { bom, cortes, csv, montagem } from '../model/bom'
-import { LIMITES } from '../model/defaults'
+import { LIMITES, PVC_PESO_LIMITE_KG } from '../model/defaults'
 import type { Ajustes, Design, Materiais, Medidas, Projeto, TipoCadeira } from '../model/types'
 import { RACAS, nomeRaca } from '../data/racas'
 import { tr } from '../i18n'
@@ -230,7 +230,9 @@ function PranchaProjeto({ p, setP }: { p: Projeto; setP: (f: (x: Projeto) => Pro
               <div className="entrada">
                 <select id="p-tubo" value={p.materiais.tubo} onChange={(e) => setMat({ tubo: e.target.value as Materiais['tubo'] })}>
                   <option value="aluminio">{tr('Alumínio', 'Aluminum')}</option>
-                  <option value="pvc">PVC</option>
+                  <option value="pvc" disabled={pvcPeloPeso(p.cao.pesoKg) === 'bloqueado'}>
+                    {pvcPeloPeso(p.cao.pesoKg) === 'bloqueado' ? tr(`PVC (só até ~${PVC_PESO_LIMITE_KG} kg)`, `PVC (only up to ~${PVC_PESO_LIMITE_KG} kg)`) : 'PVC'}
+                  </option>
                 </select>
               </div>
             </div>

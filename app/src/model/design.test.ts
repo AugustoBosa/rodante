@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { alcance, comprimentoClip, computeDesign, recuo } from './design'
+import { alcance, comprimentoClip, computeDesign, pvcPeloPeso, recuo } from './design'
 import { bom, cintas, comprados, cortes, csv } from './bom'
 import { AJUSTES_PADRAO, FITA_L, GARUPA_FRACAO, MATERIAIS_PADRAO, PEITO_FRACAO, SEGMENTO_MIN_MM } from './defaults'
 import type { Projeto } from './types'
@@ -154,4 +154,14 @@ test('barras fora do corpo: atrás da garupa e à frente do peito', () => {
   const xs = quatro.rodas.map((r) => r.pos[0])
   expect(Math.min(...xs)).toBeGreaterThanOrEqual(PEITO_FRACAO * L)
   expect(quatro.cotas.comprimentoTrilho - Math.max(...xs)).toBeGreaterThanOrEqual(GARUPA_FRACAO * L)
+})
+
+test('PVC pelo peso: até 12 kg livre, até 15 kg com aviso, acima bloqueia', () => {
+  const comPvc = (pesoKg: number) => computeDesign({ ...dachshund, cao: { ...dachshund.cao, pesoKg }, materiais: { ...dachshund.materiais, tubo: 'pvc' } }).alertas
+  expect(pvcPeloPeso(12)).toBe('ok')
+  expect(pvcPeloPeso(14)).toBe('aviso')
+  expect(pvcPeloPeso(15.5)).toBe('bloqueado')
+  expect(comPvc(10).some((a) => a.texto.includes('PVC'))).toBe(false)
+  expect(comPvc(14).some((a) => a.nivel === 'aviso' && a.texto.includes('PVC'))).toBe(true)
+  expect(comPvc(20).some((a) => a.nivel === 'erro' && a.texto.includes('PVC'))).toBe(true)
 })
