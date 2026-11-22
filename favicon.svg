@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+  <style>.t{stroke:#1f2a2e}@media (prefers-color-scheme:dark){.t{stroke:#e7ecec}.f{fill:#e7ecec}}</style>
+  <circle class="t" cx="10" cy="21" r="7" fill="none" stroke-width="2.5"/>
+  <circle class="f" cx="10" cy="21" r="2" fill="#1f2a2e"/>
+  <path class="t" d="M10 21V8h16" fill="none" stroke-width="2.5"/>
+  <rect x="14" y="5" width="10" height="5" fill="#f2b705"/>
+</svg>

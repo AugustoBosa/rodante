@@ -1,0 +1,12 @@
+Arquivos de terceiros nesta pasta (todos em domínio público, CC0 1.0)
+https://creativecommons.org/publicdomain/zero/1.0/
+
+shiba.glb
+  "Shiba Inu" por Quaternius (Animated Animal Pack), CC0 1.0.
+  Origem: https://poly.pizza/m/y4wdQpg767
+  Baixado sem modificação em 2026-11-20.
+
+cao-lado.svg
+  "Canis familiaris" (silhueta) por Margot Michaud, CC0 1.0.
+  Origem: https://www.phylopic.org/images/6f3ebbc6-be53-4216-b45b-946f7984669b
+  Baixado sem modificação em 2026-11-20.
