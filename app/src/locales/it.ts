@@ -357,5 +357,9 @@ const catalogo: Record<string, string> = {
   "Miniature Dachshund": "Bassotto nano",
   "Labrador Retriever": "Labrador Retriever",
   "German Shepherd": "Pastore Tedesco",
+  "Project in development": "Progetto in sviluppo",
+  "Rodante is still being built: there is a lot left to improve and fix. Any suggestion is welcome!": "Rodante è ancora in costruzione: c'è molto da migliorare e correggere. Ogni suggerimento è ben accetto!",
+  "Send a suggestion": "Invia un suggerimento",
+  "Got it": "Capito",
 }
 export default catalogo

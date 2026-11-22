@@ -478,3 +478,13 @@ tr:hover td { background: var(--papel-2); }
 .comprados strong { display: block; font-size: 0.98rem; }
 .comprados small { display: block; color: var(--tinta-2); font-size: 0.86rem; }
 .cortes { margin-top: 0; }
+
+/* ---------- aviso de projeto em desenvolvimento ---------- */
+.aviso {
+  max-width: min(480px, calc(100vw - 32px)); padding: 28px; border: var(--traco) solid var(--tinta);
+  border-radius: var(--raio); background: var(--papel); color: var(--tinta);
+}
+.aviso::backdrop { background: rgb(20 20 20 / 0.55); }
+.aviso h2 { margin: 0 0 12px; }
+.aviso p { margin: 0 0 20px; }
+.aviso-acoes { display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end; }

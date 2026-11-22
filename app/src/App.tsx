@@ -5,6 +5,7 @@ import { Projetos } from './ui/Projetos'
 import { Carregando } from './ui/Carregando'
 import { deLink, importar, obter } from './store'
 import { SeletorIdioma } from './ui/SeletorIdioma'
+import { AvisoDev } from './ui/AvisoDev'
 import { bcp47, tr } from './i18n'
 
 document.documentElement.lang = bcp47
@@ -101,6 +102,7 @@ export default function App() {
           <SeletorIdioma />
         </nav>
       </header>
+      <AvisoDev />
       <main ref={main} tabIndex={-1}>{pagina}</main>
       {rota !== 'projeto' && rota !== 'novo' && (
         <footer className="rodape">
